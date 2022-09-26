@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.ascc.net/xml/schematron">
+  <ns prefix="cc"  uri="https://niap-ccevs.org/cc/v1"/>
+  <ns prefix="sec" uri="https://niap-ccevs.org/cc/v1/section"/>
+  <ns prefix="h"   uri="http://www.w3.org/1999/xhtml"/>
+
+  <pattern name="Basic">
+    <rule context="/*">
+      <assert test=".//cc:abc">There needs to be an abc eleement</assert>
+    </rule>
+  </pattern>
+</schema> 

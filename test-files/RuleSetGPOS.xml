@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.ascc.net/xml/schematron">
+  <ns prefix="cc"  uri="https://niap-ccevs.org/cc/v1"/>
+  <ns prefix="sec" uri="https://niap-ccevs.org/cc/v1/section"/>
+  <ns prefix="h"   uri="http://www.w3.org/1999/xhtml"/>
+
+  <pattern name="Basic">
+    <rule context="/*">
+      <assert test="not(.//*[@id='s-ftp_ssh']) or .//*[@id='pkg-ssh']">If s-ftp_ssh is selected then the ssh package must be included.</assert>
+      <assert test=".//*[@id='pkg-ssh'] or not(.//*[@id='s-uau-ssh'])">
+      If s-uau-ssh is selected then the ssh package must be included.</assert>
+
+      <assert test=".//cc:include-pkg[.//cc:url='https://github.com/commoncriteria/ssh' and .//cc:branch='release-1.0'] or .//*[@id='s-ftp_ssh']"> </assert>
+<assert test=".//cc:include-pkg[.//cc:url='https://github.com/commoncriteria/ssh' and .//cc:branch='release-1.0'] or .//*[@id='s-uau-ssh']"> </assert>
+<assert test=".//cc:f-component[@cc-id='fdp_ifc_ext.1'] or .//*[@id='s-itc-ipsec']"> </assert>
+
+
+    </rule>
+  </pattern>
+</schema> 

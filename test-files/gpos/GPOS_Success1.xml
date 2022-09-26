@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Grab all the selectablel sizes -->
+<!-- -->
+
+
+<st xmlns="https://niap-ccevs.org/cc/v1"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    >
+
+  <include-pkg id="pkg-ssh">
+    <git>
+      <url>https://github.com/commoncriteria/ssh</url>
+      <branch>release-1.0</branch>
+    </git>
+    <url>https://www.niap-ccevs.org/Profile/Info.cfm?PPID=459&amp;id=459</url>
+  </include-pkg>
+
+  <include-pkg id="pkg-tls">
+    <git>
+      <url>https://github.com/commoncriteria/tls</url>
+      <branch>release-1.1</branch>
+    </git>
+    <url>https://www.niap-ccevs.org/Profile/Info.cfm?PPID=439&amp;id=439</url>
+  </include-pkg>
+
+
+
+  <f-component cc-id="fcs_ckm.1" name="Cryptographic Key Generation (Refined)">
+    <f-element id="fel-asym-gen">
+      <title> The <h:b>OS</h:b> shall generate <h:b>asymmetric</h:b> cryptographic keys in accordance with a
+      specified cryptographic key generation algorithm <selectables linebreak="yes">
+      <selectable id="s-keygen-rsa"><snip>RSA schemes</snip> using cryptographic key sizes of 3072-bit or greater that
+      meet the following: FIPS PUB 186-4, "Digital Signature Standard (DSS)", Appendix B.3
+      </selectable>
+      <selectable id="s-keygen-ecc"><snip>ECC schemes using "NIST curves"</snip> P-384 and
+      <selectables>
+        <selectable>P-521</selectable>
+        </selectables> that meet the following: FIPS PUB 186-4, "Digital Signature Standard (DSS)",
+        Appendix B.4
+      </selectable>
+      <selectable id="s-keygen-ffc">
+	<snip>FFC schemes</snip> using 
+	<selectables>
+	  <selectable id="s-keygen-ffc-fips">cryptographic key sizes of 3072-bit
+          or greater that meet the following: <snip>FIPS PUB 186-4</snip>, "Digital Signature
+          Standard (DSS)", Appendix B.1</selectable>
+	  <!-- <selectable id="s-keygen-ffc-dh"><snip>Diffie-Hellman Group 14</snip> that meet the following: RFC 3526 </selectable> -->
+	  <selectable id="s-keygen-ffc-safeprime"><snip>safe primes</snip> that meet the following: 
+	  NIST Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key Establishment Schemes"
+	  </selectable>
+	</selectables>
+      </selectable>
+      </selectables>.
+      </title>
+    </f-element>
+  </f-component>
+
+  <f-component cc-id="ftp_itc_ext.1" name="Trusted channel communication">
+    <f-element id="fel-trust-comms">
+      <title>
+        The OS shall use
+      	<selectables linebreak='yes'>
+          <selectable id="tls">
+	    <snip>TLS</snip> as conforming to the <xref to="pkg-tls"/> as a
+    	    <selectables><selectable id="s-tls-client"><readable>client(TLS)</readable>client</selectable><selectable id="s-tls-server"><readable>server(TLS)</readable>server</selectable></selectables>
+	  </selectable>
+          <selectable id="dtls"><snip>DTLS</snip> as conforming to the <xref to="pkg-tls"/> as a
+    	  <selectables><selectable id="s-dtls-client"><readable>client(DTLS)</readable>client</selectable><selectable id="s-dtls-server"><readable>server(DTLS)</readable>server</selectable></selectables>
+	  </selectable>
+      	  <selectable id="s-itc-ipsec">IPsec as conforming to the <xref to="mod-vpnclient"/></selectable>
+      	  <selectable id="s-ftp_ssh"><snip>SSH</snip> as conforming to the <xref to="pkg-ssh"/> as a
+    	  <selectables><selectable id="s-ssh-client"><readable>client(SSH)</readable>client</selectable><selectable id="s-ssh-server"><readable>server(SSH)</readable>server</selectable></selectables>
+	  </selectable>
+        </selectables>
+	to provide a trusted communication channel between itself and
+	authorized IT entities supporting the following capabilities:
+	<selectables>
+	  <selectable>audit server</selectable>
+	  <selectable>authentication server</selectable>
+	  <selectable>management server</selectable>
+	  <selectable><assignable>other capabilities</assignable></selectable>
+	</selectables>
+	that is logically distinct from other communication
+	channels and provides assured identification of its end points and protection of the channel
+	data from disclosure and detection of modification of the channel data.
+      </title>
+      <note role="application">
+        The ST author must include the security functional requirements for the trusted
+        channel protocol selected in <xref to="fel-trust-comms"/> in the main body of the ST.
+	<h:p>
+	  Regardless of the selections made in this requirement, the TSF must be validated against the client TLS requirements in the <xref to="pkg-tls"/>.
+	  <rule id="r-need-client-tls">
+	    <doc ref="pkg-tls"><ref-id>tlsc_impl</ref-id></doc>
+	  </rule>
+	  It must also be validated against additional requirements in the <xref to="pkg-tls"/> if <xref to="dtls"/> or <xref to="s-tls-server"/> selections are made.
+	  <rule id="r-tlss">
+	    <if><ref-id>s-tls-server</ref-id></if>
+	    <then><doc ref="pkg-tls"><ref-id>tlss_impl</ref-id></doc></then>
+	  </rule>
+	  <rule id="r-dtlsc">
+	    <if><ref-id>s-dtls-client</ref-id></if>
+	    <then><doc ref="pkg-tls"><ref-id>dtlsc_impl</ref-id></doc></then>
+	  </rule>
+	  <rule id="r-dtlss">
+	    <if><ref-id>s-dtls-server</ref-id></if>
+	    <then><doc ref="pkg-tls"><ref-id>dtlss_impl</ref-id></doc></then>
+	  </rule>
+	</h:p>
+	<h:p>
+	  If <xref to="s-itc-ipsec"/> is selected, then FDP_IFC_EXT.1 must be included in the ST.
+	</h:p>
+	<h:p>
+	  If <xref to="s-ftp_ssh"/> is selected, the TSF must be validated against
+	  the <xref to="pkg-ssh"/> and the corresponding selection is expected to be made in FIA_UAU.5.1.
+	  <rule id="r-sshclient">
+	    <if><ref-id>s-ssh-client</ref-id></if>
+	    <then><doc ref="pkg-ssh"><ref-id>ssh-client</ref-id></doc></then>
+	  </rule>
+	  <rule id="r-sshserver">
+	    <if><ref-id>s-ssh-server</ref-id></if>
+	    <then><doc ref="pkg-ssh"><ref-id>ssh-server</ref-id></doc></then>
+	  </rule>
+
+	  The ST author must include the security functional requirements for the trusted channel protocol selected in FTP_ITC_EXT.1 in the main body of the ST.
+	</h:p>
+      </note>
+      <aactivity>
+	<Tests>
+	  The evaluator will configure the OS to communicate with another
+	  trusted IT product as identified in the second selection.
+      	  The evaluator will monitor network traffic while the OS performs communication with each of the
+      	  servers identified in the second selection.
+      	  The evaluator will ensure that for each session a trusted channel was established
+      	  in conformance with the protocols identified in the first selection.
+      	</Tests>
+      </aactivity>
+    </f-element>
+  </f-component>
+  
+</st>
