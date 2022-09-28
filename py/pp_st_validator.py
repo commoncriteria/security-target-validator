@@ -22,43 +22,77 @@ ns = {'cc': "https://niap-ccevs.org/cc/v1",
 def SCH(tag):
     return "{http://www.ascc.net/xml/schematron}"+tag
 
+def CC(tag):
+    return "{"+ns['cc']+"}"+tag
 class State:
 
-    def __init__(self, root, rule):
+    def __init__(self, root, rule, url):
         self.root = root
         self.parent_map = {c: p for p in self.root.iter() for c in p}
         self.rule = rule
+        self.url = url
         self.derive_schematron()
 
     def is_foreign_depends(el):
         child = el.find("./*")        
         return child is not None
+
+    def is_optional_depends(depends):
+        child = depends.find("./*")
+        if child is None:
+            return False
+        if child.tag == CC("optional"):
+            return True
+        return False
+
+    
+    def EXT(self, url):
+        return "//cc:*[cc:git/cc:url='"+url+"']"
+    
+    def ME(self):
+        return self.EXT(self.url)
         
     def derive_schematron(self):
-        for depend in self.root.findall(".//cc:depends", ns):
-            if State.is_foreign_depends(depend):
-                print("There's a child")
+        for fcomp in self.root.findall(".//cc:f-component[cc:depends]", ns):
+            for depends in fcomp.findall("./cc:depends", ns):
+                if State.is_optional_depends(depends):
+                    continue
+                for dependency_id in depends.attrib:
+                    self.handle_dependent_fcomp(fcomp, depends.attrib[dependency_id])
+        for pack in self.root.findall(".//cc:include-pkg", ns):
+            depends_list = pack.findall("./cc:depends", ns)
+            if depends_list:
+                for depends in depends_list:
+                    if State.is_optional_depends(depends):
+                        continue
+                    for dependency_id in depends.attrib:
+                        self.handle_dependent_package(pack, depends.attrib[dependency_id])
             else:
-                parent = self.parent_map[depend]
-                for dependency_id in depend.attrib:
-                    self.handle_dependency(parent, depend.attrib[dependency_id])
+                self.handle_dependent_package(pack, None)
+                    
+    def handle_dependent_fcomp(self, dependent, dependee_id):
+        cc_id = dependent.attrib["cc-id"]
+        test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
+        cc_id = cc_id.upper()
+        if "iteration" in dependent.attrib:
+            test += "' and @iteration='"+dependent.attrib['iteration']
+            cc_id="/"+dependent.attrib['iteration']
+        test += "'] or not("+self.ME()+"//*[@id='"+dependee_id+"'])"
+        reason = "If '"+dependee_id+"' is selected, then " + cc_id + " must also be included."
+        add_assert(self.rule, test, reason)
 
-    def handle_dependency(self, dependent, dependee_id):
-        test = ""
-        if dependent.tag == "{"+ns['cc']+"}include-pkg":
-            baseurl = dependent.find(".//cc:url",ns).text;
-            branch =  dependent.find(".//cc:branch",ns).text;
-            test = ".//cc:include-pkg[.//cc:url='"+baseurl + "' and .//cc:branch='"+branch+"']"
-        elif dependent.tag == "{"+ns['cc']+"}f-component":
-            cc_id = dependent.attrib["cc-id"]
-            test = ".//cc:f-component[@cc-id='"+cc_id
-            if "iteration" in dependent.attrib:
-                test += "' and @iteration='"+dependent.attrib['iteration']
-            test += "']"
-        else:
-            return
-        test += " or .//*[@id='"+dependee_id+"']"
-        add_assert(self.rule, test, "")
+                    
+    def handle_dependent_package(self, dependent, dependee_id):
+        baseurl = dependent.find(".//cc:url",ns).text;
+        branch =  dependent.find(".//cc:branch",ns).text;
+        # test = EXT"//cc:package[cc:git/cc:url='"+baseurl + "' and cc:git/cc:branch='"+branch+"']"\
+        #     " or not("+self.ME()+"//cc:selectable[@id='"+dependee_id+"'])"
+        test = "//cc:package[cc:git/cc:url='"+baseurl + "' and cc:git/cc:branch='"+branch+"']"
+        reason = baseurl + "," + branch + "must be included in all STs"
+        if dependee_id is not None:
+            test += " or not("+self.ME()+"//cc:selectable[@id='"+dependee_id+"'])"
+            reason = "When selecting '" + dependee_id +"', you need to include " + baseurl + ", " + branch
+        add_assert(self.rule, test, reason)
 
 
 def make_schematron_skeleton():
@@ -87,10 +121,10 @@ if __name__ == "__main__":
         sys.exit(0)
 
     root, rule = make_schematron_skeleton()
-    add_assert(rule, "/*", "You shall not not pass.")
+    add_assert(rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
     #    print(lxml.etree.tostring(el, pretty_print=True))
     pp = lxml.etree.parse(sys.argv[1])
-    State(pp, rule)
+    State(pp, rule, "https://github.com/commoncriteria/operatingsystem")
     print(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8').decode("utf-8"))
     schematron = Schematron(root)
 
