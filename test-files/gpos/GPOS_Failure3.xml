@@ -467,7 +467,10 @@
           <selectable id="dtls"><snip>DTLS</snip> as conforming to the <xref to="pkg-tls"/> as a
     	  <selectables><selectable id="s-dtls-client"><readable>client(DTLS)</readable>client</selectable><selectable id="s-dtls-server"><readable>server(DTLS)</readable>server</selectable></selectables>
 	  </selectable>
-
+      	  <selectable id="s-itc-ipsec">IPsec as conforming to the <xref to="mod-vpnclient"/></selectable>
+      	  <selectable id="s-ftp_ssh"><snip>SSH</snip> as conforming to the <xref to="pkg-ssh"/> as a
+    	  <selectables><selectable id="s-ssh-client"><readable>client(SSH)</readable>client</selectable><selectable id="s-ssh-server"><readable>server(SSH)</readable>server</selectable></selectables>
+	  </selectable>
         </selectables>
 	to provide a trusted communication channel between itself and
 	authorized IT entities supporting the following capabilities:

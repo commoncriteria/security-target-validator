@@ -39,6 +39,7 @@
           <f-element id="f-tlsc-version">
             <title> The product shall implement TLS 1.2 (RFC 5246) and
               <selectables>
+                <selectable>TLS 1.1 (RFC 4346)</selectable>
                 <selectable exclusive='yes'>no earlier TLS versions</selectable>
               </selectables> as a client that supports the cipher suites
           <selectables linebreak="yes">
@@ -62,6 +63,7 @@
           <selectables linebreak="yes">
             <selectable id="tlsc_mutual_auth">mutual authentication</selectable>
             <selectable id="tlsc_reneg">session renegotiation</selectable>
+            <selectable exclusive="yes">none</selectable>
           </selectables>.
           </title>
 	  </f-element>
@@ -75,6 +77,7 @@
               server certificate is invalid
               <selectables linebreak="yes">
               <selectable exclusive="yes" id="s-tlsc-no-excep">with no exceptions</selectable>
+              <selectable id="s-tlsc-override">except when override is authorized</selectable>
             </selectables>.
 	    </title>
 	  </f-element>
@@ -129,6 +132,7 @@
           <f-element id="f-tlss-version">
             <title> The product shall implement TLS 1.2 (RFC 5246) and
             <selectables>
+              <selectable>TLS 1.1 (RFC 4346)</selectable>
               <selectable exclusive="yes">no earlier TLS versions</selectable>
             </selectables>
               as a server that supports the cipher suites
@@ -153,6 +157,7 @@
               <selectables linebreak="yes">
                 <selectable id="tlss_mutual_auth">mutual authentication</selectable>
                 <selectable id="tlss_reneg">session renegotiation</selectable>
+                <selectable exclusive="yes">none</selectable>
               </selectables>.
             </title>
 	  </f-element>
@@ -160,6 +165,7 @@
             <title>The product shall deny connections from clients requesting
             SSL 2.0, SSL 3.0, TLS 1.0 and
               <selectables>
+                <selectable>TLS 1.1</selectable>
                 <selectable exclusive="yes">none</selectable>
               </selectables>.
             </title>
@@ -172,6 +178,7 @@
                     <selectable>2048 bits</selectable>
                     <selectable>3072 bits</selectable>
                     <selectable>4096 bits</selectable>
+                    <selectable exclusive="yes">no other sizes</selectable>
                   </selectables>
                 </selectable>
                 <selectable>Diffie-Hellman parameters with size
@@ -179,6 +186,9 @@
                     <selectable>2048 bits</selectable>
                     <selectable>3072 bits</selectable>
                     <selectable>4096 bits</selectable>
+                    <selectable>6144 bits</selectable>
+                    <selectable>8192 bits</selectable>
+                    <selectable exclusive="yes">no other sizes</selectable>
                   </selectables>
                 </selectable>
                 <selectable>Diffie-Hellman groups
@@ -191,6 +201,14 @@
                     <selectable>no other groups</selectable>
                   </selectables>
               </selectable>
+              <selectable>ECDHE parameters using elliptic curves
+                <selectables>
+                  <selectable>secp256r1</selectable>
+                  <selectable id="s-tls-secp384">secp384r1</selectable>
+                  <selectable>secp521r1</selectable>
+                </selectables> and no other curves
+              </selectable>
+              <selectable exclusive="yes">no other key establishment methods</selectable>
             </selectables>.
             </title>
 	  </f-element>
@@ -249,6 +267,7 @@
       <title>The product shall implement DTLS 1.2 (RFC 6347) and
       <selectables>
         <selectable>DTLS 1.0 (RFC 4347)</selectable>
+        <selectable exclusive="yes">no earlier DTLS versions</selectable>
       </selectables> as a client that supports the cipher suites
     <selectables linebreak="yes">
       <selectable>TLS_RSA_WITH_AES_128_CBC_SHA as defined in RFC 5246</selectable>
@@ -270,6 +289,7 @@
       and also supports functionality for 
       <selectables linebreak="yes">
         <selectable id="dtlsc_mutual_auth">mutual authentication</selectable>
+        <selectable exclusive="yes">none</selectable>
       </selectables>.
       </title>
     </f-element>
@@ -283,6 +303,7 @@
       <title>The product shall not establish a trusted channel if the
         server certificate is invalid
         <selectables>
+        <selectable exclusive="yes" id="s-dtlsc-no-excep">with no exceptions</selectable>
         <selectable>except when override is authorized</selectable>
       </selectables>.
       </title>
@@ -312,6 +333,7 @@
       <title>The product shall implement DTLS 1.2 (RFC 6347) and
       <selectables>
         <selectable>DTLS 1.0 (RFC 4347)</selectable>
+        <selectable exclusive="yes">no earlier DTLS versions</selectable>
       </selectables>
         as a server that supports the ciphersuites
         <selectables linebreak="yes">
@@ -333,6 +355,7 @@
         </selectables> and no other cipher suites,
         and also supports functionality for
         <selectables linebreak="yes">
+          <selectable id="dtlss_mutual_auth">mutual authentication</selectable>
           <selectable exclusive="yes">none</selectable>
       </selectables>.
       </title>
@@ -356,6 +379,8 @@
             <selectables>
               <selectable>2048 bits</selectable>
               <selectable>3072 bits</selectable>
+              <selectable>4096 bits</selectable>
+              <selectable exclusive="yes">no other sizes</selectable>
             </selectables>
           </selectable>
           <selectable>Diffie-Hellman parameters with size
@@ -365,6 +390,7 @@
               <selectable>4096 bits</selectable>
               <selectable>6144 bits</selectable>
               <selectable>8192 bits</selectable>
+              <selectable exclusive="yes">no other size</selectable>
             </selectables>
           </selectable>
           <selectable>Diffie-Hellman groups
@@ -383,6 +409,7 @@
               <selectable>secp384r1</selectable>
               <selectable>secp521r1</selectable>
             </selectables> and no other curves</selectable>
+          <selectable exclusive="yes">no other key establishment methods</selectable>
         </selectables>.
       </title>
     </f-element>
@@ -421,8 +448,8 @@
 
   <base-pp>
     <git>
-      <url>https://github.com/commoncriteria/operatingsystem</url>
-      <branch>release-4.2.1</branch>
+      <url>https://github.com/commoncriteria/tls</url>
+      <branch>release-1.1</branch>
       <commit>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</commit>
     </git>
   <f-component cc-id="fcs_ckm.1" name="Cryptographic Key Generation (Refined)">
@@ -467,7 +494,10 @@
           <selectable id="dtls"><snip>DTLS</snip> as conforming to the <xref to="pkg-tls"/> as a
     	  <selectables><selectable id="s-dtls-client"><readable>client(DTLS)</readable>client</selectable><selectable id="s-dtls-server"><readable>server(DTLS)</readable>server</selectable></selectables>
 	  </selectable>
-
+      	  <selectable id="s-itc-ipsec">IPsec as conforming to the <xref to="mod-vpnclient"/></selectable>
+      	  <selectable id="s-ftp_ssh"><snip>SSH</snip> as conforming to the <xref to="pkg-ssh"/> as a
+    	  <selectables><selectable id="s-ssh-client"><readable>client(SSH)</readable>client</selectable><selectable id="s-ssh-server"><readable>server(SSH)</readable>server</selectable></selectables>
+	  </selectable>
         </selectables>
 	to provide a trusted communication channel between itself and
 	authorized IT entities supporting the following capabilities:
