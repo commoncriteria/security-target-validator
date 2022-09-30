@@ -7,19 +7,11 @@
 <st xmlns="https://niap-ccevs.org/cc/v1"
     xmlns:h="http://www.w3.org/1999/xhtml"
     >
-
-  <include-pkg id="pkg-ssh">
-    <git>
-      <url>https://github.com/commoncriteria/ssh</url>
-      <branch>release-1.0</branch>
-    </git>
-    <url>https://www.niap-ccevs.org/Profile/Info.cfm?PPID=459&amp;id=459</url>
-  </include-pkg>
-
   <package>
     <git>
       <url>https://github.com/commoncriteria/tls</url>
       <branch>release-1.1</branch>
+      <commit>53aaae9ea56c98e49b767ca19b2b6058206bab25</commit>
     </git>
 
     <f-component cc-id="fcs_tls_ext.1" name="TLS Protocol">
@@ -422,8 +414,8 @@
   <base-pp>
     <git>
       <url>https://github.com/commoncriteria/operatingsystem</url>
-      <branch>release-4.2.1</branch>
-      <commit>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</commit>
+      <branch>release-4.3</branch>
+      <commit>3566d59e9044a973a9c0a039d014f162fe63e21c</commit>
     </git>
   <f-component cc-id="fcs_ckm.1" name="Cryptographic Key Generation (Refined)">
     <f-element id="fel-asym-gen">

@@ -9,12 +9,10 @@ import sys
 from lxml.etree import Schematron
 from  lxml.etree import Element, SubElement
 import lxml.etree
-# import xml.etree.ElementTree as ET
+import os
+import subprocess
+from pathlib import Path
 
-# from io import StringIO
-# import re
-# import string
-# from xml.sax.saxutils import quoteattr, escape
 ns = {'cc': "https://niap-ccevs.org/cc/v1",
       'sec': "https://niap-ccevs.org/cc/v1/section",
       'htm': "http://www.w3.org/1999/xhtml"}
@@ -24,8 +22,9 @@ def SCH(tag):
 
 def CC(tag):
     return "{"+ns['cc']+"}"+tag
-class State:
 
+class State:
+    """ This class represents the Protection Profile document. """
     def __init__(self, root, rule, url):
         self.root = root
         self.parent_map = {c: p for p in self.root.iter() for c in p}
@@ -33,6 +32,7 @@ class State:
         self.url = url
         self.derive_schematron()
 
+        
     def is_foreign_depends(el):
         child = el.find("./*")        
         return child is not None
@@ -45,7 +45,6 @@ class State:
             return True
         return False
 
-    
     def EXT(self, url):
         return "//cc:*[cc:git/cc:url='"+url+"']"
     
@@ -69,7 +68,61 @@ class State:
                         self.handle_dependent_package(pack, depends.attrib[dependency_id])
             else:
                 self.handle_dependent_package(pack, None)
-                    
+        for rule in self.root.findall(".//cc:rule[cc:if]", ns):
+            if_el = rule.find("./cc:if",ns)
+            if if_el is None:
+                test = self.stringify_and(rule)
+            else:
+                test = "not"+self.stringify_and(if_el)
+                then_el = rule.find("./cc:then", ns)
+                test += " or " + self.stringify_and(then_el)
+            reason = ""
+            if "id" in rule.attrib:
+                reason = "Rule (IF/THEN) id:'"+rule.attrib["id"]+"'"
+            add_assert(self.rule, test , reason)
+
+    def stringify_and(self, top):
+        return self.stringify_loop(top, "and")
+
+    def stringify_or(self, or_el):
+        return self.stringify_loop(top, "or")
+
+    def stringify_loop(self, top, op):
+        magic = "("
+        ret = ""
+        spaced_op = " "+op+" "
+        for child in top:
+            ret += magic
+            magic= spaced_op
+            if child.tag == CC("ref-id"):
+                ret += self.stringify_refid(child)
+            elif child.tag == CC("and"): # This should never be called
+                ret += self.stringify_and(child)
+            elif child.tag == CC("or"):
+                ret += self.stringify_or(child)
+            elif child.tag == CC("doc"):
+                ret += self.stringify_doc(child)
+            elif child.tag == CC("not"):
+                ret += "not"+self.stringify_and(child)
+            else:
+                Error("Blah")
+        return ret+")"
+
+
+    def stringify_refid(self, ref_el):
+        return self.ME()+"//cc:*[@id='"+ref_el.text+"']"
+
+    def stringify_doc(self, doc_el):
+        ret=""
+        local_doc_id = doc_el.attrib["ref"]
+        doc_url = self.root.find("*[@id='"+local_doc_id+"']/cc:git/cc:url",ns).text
+        magic="("
+        for kid in doc_el:
+            ret += magic + self.EXT(doc_url)+"//*[@id='" +kid.text+"']"
+            magic= " and "
+        return ret+")"
+
+        
     def handle_dependent_fcomp(self, dependent, dependee_id):
         cc_id = dependent.attrib["cc-id"]
         test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
@@ -114,27 +167,84 @@ def add_assert(rule_el, test, descrip):
     assert_el.attrib["test"]=test
     assert_el.text = descrip
 
-                    
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: <pp-xml> <st-xml>")
-        sys.exit(0)
 
+# def get_effective_doc(url, branch, fpath):
+#     workdir = tempfile.TemporaryDirectory()
+#     abspath = os.path.abspath(fpath)
+#     commands = ("cd "+workdir.name +
+#                 " && git clone --branch " + branch + " --recursive " + url +
+#                 " && cd * && " +
+#                 " (unset PP_XML; EFF_XML=\"" + abspath + "\"  make effective)")
+#     os.system(commands)
+def validate_st_against_ppdoc(st, pp_str, url):
+    pp = lxml.etree.fromstring(pp_str)
     root, rule = make_schematron_skeleton()
     add_assert(rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
-    #    print(lxml.etree.tostring(el, pretty_print=True))
-    pp = lxml.etree.parse(sys.argv[1])
-    State(pp, rule, "https://github.com/commoncriteria/operatingsystem")
+    State(pp, rule, url)
     print(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8').decode("utf-8"))
     schematron = Schematron(root)
-
-    st = lxml.etree.parse(sys.argv[2])
     res = schematron.validate(st)
     if res:
         print("SUCCESS: "+sys.argv[2])
     else:
         print("FAILURE: "+sys.argv[2])
         print(schematron.error_log)
+
+
+    
+def get_all_effectives(st, is_updating):
+    workdir=Path.home()/"commoncriteria/ref-repo"
+    mydir=(Path(".")/"mock-transforms").resolve()
+    if not(workdir.is_dir()):
+        print("The directory to store reference repositories does not exist: "+str(workdir))
+        sys.exit(1)
+    for gits in st.findall(".//"+CC("git")):
+        url = gits.find(CC("url")).text
+        branch = gits.find(CC("branch")).text
+        projname = url.rsplit('/', 1)[-1]
+        projdir = workdir/projname
+        # TODO make this system agnostic
+        if not(projdir.is_dir()):
+            os.chdir(workdir)
+            clone = "git clone --branch "+ branch + " " + url
+            os.system(clone)
+        os.chdir(projdir)
+        if is_updating:
+            os.system("git pull -f ")
+        try:
+            commit_el = gits.find(CC("commit"))
+            revert_cmd = "git revert -n "+commit_el.text
+            os.system(revert_cmd)
+        except:
+            print("Failed to revert project. Pushing forward")
+
+        print("Mydir is "+str(mydir))
+        env=dict(os.environ, TRANS=str(mydir))
+        # subprocess.Popen(['echo', 'hello'])
+
+        # subprocess.Popen(['make', '-s'], env=env).wait()
+        # sys.exit(0)
+
+        process = subprocess.Popen("make -s", env=env, shell=True,text=True, stdout=subprocess.PIPE)
+        out,err = process.communicate()
+        # eff_xml_str = subprocess.check_output("EFF_XML='&1' make -s effective", shell=True, text=True)
+        # #pp_doc = lxml.etree.fromparse(eff_xml_str)
+        # os.system("EFF_XML=effective.xml make effective")
+        validate_st_against_ppdoc(st, out, url)
+        # pp_doc = lxml.etree.parse("effective.xml")
+        # print("proj: "+projname)
+        # print("Git: "+url)
+                    
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: [--dont-update] <pp-xml> <work-dir>")
+#        print("Usage: <pp-xml> <st-xml>")
+        sys.exit(0)
+    st = lxml.etree.parse(sys.argv[2])
+    get_all_effectives(st, True)
+
+    sys.exit(0)
+    #    print(lxml.etree.tostring(el, pretty_print=True))
 
     
 
