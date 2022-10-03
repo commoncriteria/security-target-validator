@@ -50,14 +50,17 @@ class State:
     
     def ME(self):
         return self.EXT(self.url)
-        
-    def derive_schematron(self):
+
+    def derive_fcomponent_asserts(self):
         for fcomp in self.root.findall(".//cc:f-component[cc:depends]", ns):
             for depends in fcomp.findall("./cc:depends", ns):
                 if State.is_optional_depends(depends):
                     continue
                 for dependency_id in depends.attrib:
                     self.handle_dependent_fcomp(fcomp, depends.attrib[dependency_id])
+    
+    def derive_schematron(self):
+        self.derive_fcomponent_asserts()
         for pack in self.root.findall(".//cc:include-pkg", ns):
             depends_list = pack.findall("./cc:depends", ns)
             if depends_list:
@@ -177,6 +180,7 @@ def add_assert(rule_el, test, descrip):
 #                 " (unset PP_XML; EFF_XML=\"" + abspath + "\"  make effective)")
 #     os.system(commands)
 def validate_st_against_ppdoc(st, pp_str, url):
+    print("Looking for "+pp_str)
     pp = lxml.etree.fromstring(pp_str)
     root, rule = make_schematron_skeleton()
     add_assert(rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
