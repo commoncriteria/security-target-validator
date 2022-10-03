@@ -1,8 +1,0 @@
-<ns0:schema xmlns:ns0="http://www.ascc.net/xml/schematron">
-  <ns0:ns prefix="cc" url="https://niap-ccevs.org/cc/v1"/>
-  <ns0:ns prefix="sec" url="https://niap-ccevs.org/cc/v1/section"/>
-  <ns0:ns prefix="htm" url="http://www.w3.org/1999/xhtml"/>
-  <ns0:pattern name="Basic">
-    <ns0:rule context="/*"/>
-  </ns0:pattern>
-</ns0:schema>
