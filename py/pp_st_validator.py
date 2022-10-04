@@ -179,7 +179,7 @@ def make_schematron_skeleton():
         ns_element = SubElement(el, SCH("ns"))
         ns_element.attrib["prefix"] = aa
         ns_element.attrib["uri"]= ns[aa]
-        print("ns["+aa+"]: " + ns[aa])
+#        print("ns["+aa+"]: " + ns[aa])
 
     patt = SubElement(el, SCH("pattern"))
     patt.attrib["name"]="Basic"
@@ -202,7 +202,7 @@ def add_assert(rule_el, test, descrip):
 #                 " (unset PP_XML; EFF_XML=\"" + abspath + "\"  make effective)")
 #     os.system(commands)
 def validate_st_against_ppdoc(st, pp_str, url):
-    print("Looking for "+pp_str)
+    # print("Looking for "+pp_str)
     pp = lxml.etree.fromstring(pp_str)
     root, rule = make_schematron_skeleton()
     add_assert(rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
@@ -246,7 +246,7 @@ def get_all_effectives(st, is_updating):
         except:
             print("Failed to revert project. Pushing forward")
 
-        print("Mydir is "+str(mydir))
+        # print("Mydir is "+str(mydir))
         env=dict(os.environ, TRANS=str(mydir))
         # subprocess.Popen(['echo', 'hello'])
 
