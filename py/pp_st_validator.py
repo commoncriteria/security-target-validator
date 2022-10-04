@@ -52,15 +52,18 @@ class State:
         return self.EXT(self.url)
 
     def derive_fcomponent_asserts(self):
-        for fcomp in self.root.findall(".//cc:f-component[cc:depends]", ns):
-            for depends in fcomp.findall("./cc:depends", ns):
-                if State.is_optional_depends(depends):
-                    continue
-                for dependency_id in depends.attrib:
-                    self.handle_dependent_fcomp(fcomp, depends.attrib[dependency_id])
-    
-    def derive_schematron(self):
-        self.derive_fcomponent_asserts()
+        for fcomp in self.root.findall(".//cc:f-component", ns):
+            dependses = fcomp.findall("./cc:depends", ns)
+            if dependses:
+                for depends in dependses:
+                    if State.is_optional_depends(depends):
+                        continue
+                    for dependency_id in depends.attrib:
+                        self.handle_dependent_fcomp(fcomp, depends.attrib[dependency_id])
+            else:
+                self.handle_mandatory_fcomp(fcomp)
+                
+    def derive_packages_asserts(self):
         for pack in self.root.findall(".//cc:include-pkg", ns):
             depends_list = pack.findall("./cc:depends", ns)
             if depends_list:
@@ -71,6 +74,8 @@ class State:
                         self.handle_dependent_package(pack, depends.attrib[dependency_id])
             else:
                 self.handle_dependent_package(pack, None)
+
+    def derive_rules_asserts(self):
         for rule in self.root.findall(".//cc:rule[cc:if]", ns):
             if_el = rule.find("./cc:if",ns)
             if if_el is None:
@@ -83,6 +88,12 @@ class State:
             if "id" in rule.attrib:
                 reason = "Rule (IF/THEN) id:'"+rule.attrib["id"]+"'"
             add_assert(self.rule, test , reason)
+        
+                    
+    def derive_schematron(self):
+        self.derive_fcomponent_asserts()
+        self.derive_packages_asserts()
+        self.derive_rules_asserts()
 
     def stringify_and(self, top):
         return self.stringify_loop(top, "and")
@@ -125,6 +136,17 @@ class State:
             magic= " and "
         return ret+")"
 
+    def handle_mandatory_fcomp(self, dependent):
+        cc_id = dependent.attrib["cc-id"]
+        test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
+        cc_id = cc_id.upper()
+        if "iteration" in dependent.attrib:
+            test += "' and @iteration='"+dependent.attrib['iteration']
+            cc_id="/"+dependent.attrib['iteration']
+        test += "']"
+        reason =  cc_id + " is mandatory and, therefore, must also be included in the ST."
+        add_assert(self.rule, test, reason)
+        
         
     def handle_dependent_fcomp(self, dependent, dependee_id):
         cc_id = dependent.attrib["cc-id"]
@@ -211,13 +233,15 @@ def get_all_effectives(st, is_updating):
         if not(projdir.is_dir()):
             os.chdir(workdir)
             clone = "git clone --branch "+ branch + " " + url
+            print("Cloning: " + clone)
             os.system(clone)
         os.chdir(projdir)
         if is_updating:
             os.system("git pull -f ")
         try:
             commit_el = gits.find(CC("commit"))
-            revert_cmd = "git revert -n "+commit_el.text
+            revert_cmd = "git reset --hard "+commit_el.text
+#            revert_cmd = "git revert  -n "+commit_el.text
             os.system(revert_cmd)
         except:
             print("Failed to revert project. Pushing forward")
