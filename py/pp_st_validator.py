@@ -218,8 +218,7 @@ def validate_st_against_ppdoc(st, pp_str, url):
 
 
     
-def get_all_effectives(st, is_updating):
-    workdir=Path.home()/"commoncriteria/ref-repo"
+def get_all_effectives(st, is_updating, workdir):
     mydir=(Path(".")/"mock-transforms").resolve()
     if not(workdir.is_dir()):
         print("The directory to store reference repositories does not exist: "+str(workdir))
@@ -266,14 +265,23 @@ def get_all_effectives(st, is_updating):
                     
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: [--dont-update] <pp-xml> <work-dir>")
+        print("Usage: [--dont-update] [<work-dir>] <st-xml>")
 #        print("Usage: <pp-xml> <st-xml>")
         sys.exit(0)
-    st = lxml.etree.parse(sys.argv[2])
-    get_all_effectives(st, True)
 
-    sys.exit(0)
-    #    print(lxml.etree.tostring(el, pretty_print=True))
+    curr = 1
+    should_update = True
+    if sys.argv[curr] == "--dont-update":
+        print("Dont update")
+        should_update = False
+        curr+=1
+    workdir=Path.home()/"commoncriteria/ref-repo"
+    tempy = Path(sys.argv[curr])
+    if tempy.is_dir():
+        workdir=tempy
+        curr+=1
+    st = lxml.etree.parse(sys.argv[2])
+    get_all_effectives(st, should_update, workdir)
 
     
 
