@@ -237,7 +237,8 @@ def get_all_effectives(st, is_updating):
             os.system(clone)
         os.chdir(projdir)
         if is_updating:
-            os.system("git pull -f ")
+            os.system("git pull -f --all")
+        os.system("git checkout " + branch)
         try:
             commit_el = gits.find(CC("commit"))
             revert_cmd = "git reset --hard "+commit_el.text
