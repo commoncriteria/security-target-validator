@@ -215,8 +215,6 @@ def validate_st_against_ppdoc(st, pp_str, url):
     else:
         print("FAILURE: "+sys.argv[2])
         print(schematron.error_log)
-
-
     
 def get_all_effectives(st, is_updating, workdir):
     mydir=(Path(".")/"mock-transforms").resolve()
@@ -246,10 +244,7 @@ def get_all_effectives(st, is_updating, workdir):
         except:
             print("Failed to revert project. Pushing forward")
 
-        # print("Mydir is "+str(mydir))
         env=dict(os.environ, TRANS=str(mydir))
-        # subprocess.Popen(['echo', 'hello'])
-
         # subprocess.Popen(['make', '-s'], env=env).wait()
         # sys.exit(0)
 
