@@ -1,0 +1,3043 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Grab all the selectablel sizes -->
+<!-- -->
+
+
+<st xmlns="https://niap-ccevs.org/cc/v1"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    >
+  <module>
+    <git>
+      <url>https://github.com/commoncriteria/vpnclient</url>
+      <branch>v2.4</branch>
+      <commit>0dbd085b0f306e0573143d72f0cbb38b57730c5d</commit>
+    </git>
+
+    <modified-sfrs>
+      
+    <f-component cc-id="fcs_ckm.1" id="os-fcs-ckm-1" name="Cryptographic Key Generation">
+      <f-element id="os-fcs-ckm-1e1">
+	<title><h:b>The OS shall generate asymmetric cryptographic keys in accordance with a specified
+	cryptographic key generation algorithm: 
+	<h:ul><h:i>
+          <h:li>ECC schemes using “NIST curves” P-256, P-384, and <selectables>
+          <selectable>P-521</selectable>
+	</selectables>
+	that meet the following: FIPS PUB 186-4, “Digital Signature
+	Standard (DSS),” Appendix B.4, and,
+      </h:li></h:i>
+    </h:ul></h:b>
+    <selectables linebreak="yes">
+      <selectable>RSA schemes using cryptographic key sizes of 2048-bit or greater that meet
+      the following: FIPS PUB 186-4, “Digital Signature Standard (DSS),”
+      Appendix B.3</selectable>
+      <selectable>FFC schemes using cryptographic key sizes of 2048-bit or greater that meet
+      the following: FIPS PUB 186-4, “Digital Signature Standard (DSS),”
+      Appendix B.1</selectable> 
+      <selectable>FFC Schemes using Diffie-Hellman group 14 that meet the following: RFC
+      3526</selectable>
+      <selectable>FFC Schemes using safe primes that meet the following: ‘NIST Special
+      Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key
+      Establishment Schemes</selectable>
+    </selectables>
+    <h:s>and specified cryptographic key sizes [assignment: cryptographic key sizes] that
+    meet the following: [assignment: list of standards]</h:s>.
+	</title>
+	<note role="application">
+          This SFR is functionally identical to what is defined in the GPOS PP except that
+          ECC key generation with support for P-256 and P-384 has been made mandatory
+          in support of IPsec due to the mandated support for Diffie-Hellman (DH) groups 19 and 20 in
+          FCS_IPSEC_EXT.1.8. The ST author must select all key generation schemes used
+          for key establishment and entity authentication. When key generation is used for
+          key establishment, the schemes in FCS_CKM.2 and selected cryptographic
+          protocols must match the selection. When key generation is used for entity
+          authentication, the public key is expected to be associated with an X.509v3
+          certificate.<h:br/><h:br/>
+          If the OS acts only as a receiver in the RSA key establishment scheme, the OS
+          does not need to implement RSA key generation.
+	</note>
+
+      </f-element>
+      
+    </f-component>
+
+    <!-- 5.1.1.2 FCS_CKM.2 Cryptographic Key Establishment -->
+    <f-component cc-id="fcs_ckm.2" id="os-fcs-ckm-2" name="Cryptographic Key Establishment">
+      <consistency-rationale>The ST author is instructed to make specific selections at minimum to
+      address VPN client requirements; the SFR behavior itself is
+      unmodified.</consistency-rationale>
+      <f-element id="os-fcs-ckm-2e1">
+	<title><h:b>The OS shall implement functionality to perform cryptographic key
+	establishment in accordance with a specified key establishment method:</h:b>
+	<h:ul>
+          <h:li><h:b><h:i>Elliptic curve-based key establishment schemes that meets the following:
+          NIST Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key
+          Establishment Schemes Using Discrete Logarithm Cryptography,” and</h:i></h:b>
+          </h:li>
+	</h:ul>
+	<selectables linebreak="yes">
+          <selectable>RSA-based key establishment schemes that meets the following: RSAESPKCS1-v1_5 as specified in Section 7.2 of RFC 8017, “Public-Key
+          Cryptography Standards (PKCS) #1: RSA Cryptography Specifications
+          Version 2.2</selectable>
+          <selectable>Finite field-based key establishment schemes that meets the following: NIST
+          Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key
+          Establishment Schemes Using Discrete Logarithm Cryptography”</selectable>
+          <selectable>Key establishment scheme using Diffie-Hellman group 14 that meets the
+          following: RFC 3526</selectable>
+	</selectables>
+	<h:s>that meets the following [assignment: list of standards]</h:s>.
+	</title>
+	<note role="application">
+          This SFR is functionally identical to what is defined in the GPOS PP except that elliptic curve cryptography (ECC) key generation with support for P-256 and P-384 has been made mandatory in support of IPsec 
+          due to the mandated support for DH groups 19 and 20 in FCS_IPSEC_EXT.1.8. 
+          <h:br/><h:br/>
+          The ST author must select all key establishment schemes used for the selected
+          cryptographic protocols.<h:br/><h:br/>
+          The elliptic curves used for the key establishment scheme must correlate with
+          the curves specified in FCS_CKM.1.1. The domain parameters used for the finite
+          field-based key establishment scheme are specified by the key generation
+          according to FCS_CKM.1.1.
+	</note>
+      </f-element>
+      
+    </f-component>
+
+    <!-- 5.1.1.3 FCS_COP.1(1) Cryptographic Operation (Encryption/Decryption)  -->
+    <f-component cc-id="fcs_cop.1" id="os-fcs-cop-1-1" name="Cryptographic Operation (Encryption and Decryption)" iteration="1">
+      <consistency-rationale>The SFR is refined to list an additional AES mode that must be
+      supported to address VPN client requirements; the use of this mode
+      for VPN connectivity does not impact the ability of the OS to satisfy
+      any of its other security requirements.</consistency-rationale>
+      <f-element id="os-fcs-cop-1e1i1">
+	<title>The OS shall perform [encryption/decryption services for data] in accordance with
+	a specified cryptographic algorithm
+	<h:ul><h:b>
+          <h:li>AES-CBC (as defined in NIST SP 800-38A),</h:li>
+          <h:li>AES-GCM (as defined in NIST SP 800-38D), and</h:li></h:b>
+	</h:ul>
+	<selectables linebreak="yes">
+          <selectable><h:b>AES-XTS (as defined in NIST SP 800-38E)</h:b></selectable>
+          <selectable>AES-CCMP (as defined in FIPS PUB 197, NIST SP 800-38C and IEEE
+          802.11-2012)</selectable>
+          <selectable>AES Key Wrap (KW) (as defined in NIST SP 800-38F)</selectable>
+          <selectable>AES Key Wrap with Padding (KWP) (as defined in NIST SP 800-38F)</selectable>
+          <selectable>AES-CCM (as defined in NIST SP 800-38C)</selectable>
+          <selectable>AES-CCMP-256 (as defined in NIST SP 800-38C and IEEE 802.11ac-2013)</selectable>
+          <selectable>AES-GCMP-256 (as defined in NIST SP 800-38D and IEEE 802.11ac-2013)</selectable>
+	</selectables>
+	and cryptographic key sizes 
+	<selectables>
+          <selectable>128-bit</selectable>
+          <selectable>256-bit</selectable>
+          </selectables>.
+	</title>
+	<note role="application">
+          This SFR is defined in the GPOS PP as FCS_COP.1(1); the formatting of iteration convention was
+	  updated to be consistent with the PP-Module's conventions. <h:br/><h:br/> 
+          This SFR is identical to what is defined in the GPOS PP except that support for
+          CBC and GCM mode is mandatory in order to address the requirements for
+          FCS_IPSEC_EXT.1. In addition, both 128-bit and 256-bit for key sizes must be
+          selected in order to meet the requirements for FCS_IPSEC_EXT.1.
+	</note>
+      </f-element>
+      
+    </f-component>
+    <!-- </section> -->
+    </modified-sfrs>
+
+    <!-- 5.1.2 Additional SFRs -->
+    <additional-sfrs>
+      <!--        This section lists additional SFRs that must be added to the TOE boundary in order to implement the
+	   functionality in any PP-Configuration where the GPOS PP is claimed as the Base-PP.
+      -->
+      <section title="Cryptographic Support (FCS)" id="os-a-fcs">
+	
+	<!-- 5.1.2.1 FCS_CKM_EXT.2 Cryptographic Key Storage  -->
+	<f-component cc-id="fcs_ckm_ext.2" id="os-fcs-ckm-ext-2" name="Cryptographic Key Storage">
+	  <consistency-rationale>Storage of key data related to VPN functionality can be accomplished
+	  using the same mechanism defined by FCS_STO_EXT.1 in the GPOS PP.</consistency-rationale>
+	  <comp-lev>requires the TSF to securely store key data when not in use.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>There are no auditable events foreseen.</audit>
+	  <dependencies>No dependencies.</dependencies>
+	  <f-element id="os-fcs-ckm-ext-2e1">
+            <title>The <selectables onlyone="yes">
+            <selectable>VPN client</selectable>
+            <selectable>OS</selectable>
+            </selectables> shall store persistent secrets and private keys
+            when not in use in OS-provided key storage.
+            </title>
+	  </f-element>
+	</f-component>
+      </section>
+
+      <section title="Identification and Authentication (FIA)" id="os-a-fia">
+	<ext-comp-def title="X.509 Certificate Use and Management" fam-id="FIA_X509_EXT">
+	  <fam-behavior>Components in this family describe the requirements that pertain to IP traffic and information flow
+	  through the VPN client.</fam-behavior>
+	</ext-comp-def>
+	
+	<!-- 5.1.2.2 FIA_X509_EXT.3 X.509 Certificate Authentication -->
+	<f-component cc-id="fia_x509_ext.3" id="os-fia-x509-ext-3" name="X.509 Certificate Use and Management">
+	  <consistency-rationale>This SFR defines additional uses for X.509 certificate functionality that
+	  do not conflict with those defined in the GPOS PP.</consistency-rationale>
+	  <comp-lev>requires the TOE to perform X.509 certificate
+	  authentication and describes the behavior that is followed if the status of the certificate is unknown or
+	  invalid.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>There are no auditable events foreseen.</audit>
+	  <dependencies>FIA_X509_EXT.1 X.509 Certificate Validation<h:br/><h:br/>
+	  <no-link>FPT_TST_EXT.1</no-link> TSF Self-Test<h:br/><h:br/>
+	  FPT_TUD_EXT.1 Trusted Update</dependencies>
+	  <f-element id="os-fia-x509-ext-3e1">
+            <title>The TSF shall use X.509v3 certificates as defined by RFC 5280 to support
+            authentication for IPsec exchanges, and <selectables>
+            <selectable>digital signatures for FPT_TUD_EXT.1</selectable>
+            <selectable>integrity checks for FPT_TST_EXT.1</selectable>
+            </selectables>.
+            </title>
+	  </f-element>
+	  <f-element id="os-fia-x509-ext-3e2">
+            <title>
+              When a connection to determine the validity of a certificate cannot be
+              established, the <selectables onlyone="yes">
+              <selectable>VPN client</selectable>
+              <selectable>OS</selectable>
+              </selectables> shall <selectables onlyone="yes">
+              <selectable>allow the administrator to choose whether to accept the certificate in these cases</selectable>
+              <selectable>accept the certificate</selectable>
+              <selectable>not accept the certificate</selectable>
+              </selectables>.
+            </title>
+
+	  </f-element>
+	  <f-element id="os-fia-x509-ext-3e3">
+            <title>
+              The <selectables onlyone="yes">
+              <selectable>VPN client</selectable>
+              <selectable>OS</selectable>
+              </selectables> shall not establish an SA if a certificate or
+              certificate path is deemed invalid.
+            </title>
+	  </f-element>
+	  
+	</f-component>
+      </section>
+
+      <section title="Trusted Path/Channels (FTP)" id="os-a-ftp">
+	
+	<!-- 5.1.2.3 FTP_ITC Inter-TSF Trusted Channel -->
+	<f-component cc-id="ftp_itc.1" id="os-ftp-itc-1" name="Inter-TSF Trusted Channel">
+	  <consistency-rationale>This SFR defines a trusted channel for IPsec, which is added
+	  functionality that does not prevent the existing OS functions from
+	  being performed.
+	  </consistency-rationale>
+	  <f-element id="os-ftp-itc-1e1">
+            <title>
+              The <h:b><selectables onlyone="yes">
+              <selectable>VPN client</selectable>
+              <selectable>OS</selectable>
+            </selectables>
+            shall use IPsec to provide</h:b> a <h:b>trusted</h:b>
+            communication channel between itself and <h:b>
+            <selectables linebreak="yes">
+              <selectable>a remote VPN gateway</selectable>
+              <selectable>a remote VPN client</selectable>
+              <selectable>a remote IPsec-capable network device</selectable>
+              </selectables></h:b> that is logically
+              distinct from other communication channels and provides assured identification
+              of its end points and protection of the channel data <h:b>from disclosure and
+              detection of modification of the channel data</h:b>.
+            </title>
+	  </f-element>
+	  <f-element id="os-ftp-itc-1e2">
+            <title>
+              The <h:b>
+              <selectables onlyone="yes">
+		<selectable>VPN client</selectable>
+		<selectable>OS</selectable>
+		</selectables></h:b> shall permit [<h:i>the TSF</h:i>] to initiate communication with the trusted channel.
+            </title>
+	  </f-element>
+	  <f-element id="os-ftp-itc-1e3">
+            <title>
+              The <h:b>
+              <selectables onlyone="yes">
+		<selectable>VPN client</selectable>
+		<selectable>OS</selectable>
+		</selectables></h:b> shall initiate communication via the trusted
+		channel [<h:i>for all traffic traversing that connection</h:i>].
+            </title>
+
+	  </f-element>
+	  
+	</f-component>
+      </section>
+    </additional-sfrs>
+
+
+    <!-- 5.5 TOE Security Functional Requirements -->
+    <man-sfrs>
+      <!--		The following section describes the SFRs that must be satisfied by any TOE that claims conformance to
+	  this PP-Module. These SFRs must be claimed regardless of which PP-Configuration is used to define the TOE.
+      -->
+      <!-- This section does not appear in the manually generated v2.3 doc for some reason -->
+      <section id="ss-audit-table" title="Auditable Events for Mandatory SFRs">
+	<audit-table id="at-mandatory" table="mandatory">
+	  <h:br/><h:b><ctr ctr-type="Table" pre="Table " id="atref-mandatory">: Auditable Events for Mandatory SFRs</ctr></h:b>
+	</audit-table>
+      </section>
+
+
+      <!-- 5.5.1 Cryptographic Support --> 
+      <section title="Cryptographic Support (FCS)" id="m-fcs">
+	
+
+	<!--        <ext-comp-def title="Cryptographic Key Management" fam-id="FCS_CKM_EXT">
+             <fam-behavior>Components in this family describe requirements for key management functionality such as key storage
+             and destruction.</fam-behavior>
+             </ext-comp-def>  -->
+
+	<ext-comp-def title="IPsec" fam-id="FCS_IPSEC_EXT">
+	  <fam-behavior>Components in this family describe requirements for IPsec implementation.</fam-behavior>
+	</ext-comp-def>
+
+	<!-- 5.5.1.1. FCS_CKM.1/VPN Cryptographic Key Generation (IKE)  -->
+	<f-component name="VPN Cryptographic Key Generation (IKE)" cc-id="fcs_ckm.1" id="fcs-ckm-1-vpn" iteration="VPN">
+	  <consistency-rationale></consistency-rationale>
+	  <f-element id="fcs-ckm-1e1i1">
+	    <title>
+	      The TSF shall <h:b>
+	      <selectables onlyone="yes">
+		<selectable>invoke platform-provided functionality</selectable>
+		<selectable>implement functionality</selectable>
+	      </selectables>
+	      to </h:b>generate <h:b>asymmetric</h:b> cryptographic keys <h:b>used for IKE peer authentication</h:b>
+	      in accordance with:
+	      <h:b><selectables linebreak="yes">
+		<selectable>FIPS PUB 186-4, “Digital Signature Standard (DSS),” Appendix B.3 for RSA schemes</selectable>
+		<selectable>FIPS PUB 186-4, “Digital Signature Standard (DSS),” Appendix B.4 for
+		ECDSA schemes and implementing “NIST curves,” P-256, P-384 and
+		<selectables>
+		  <selectable>P-521</selectable>
+		</selectables>
+		</selectable>
+	      </selectables></h:b>
+	      and specified cryptographic key sizes [<h:i>equivalent to, or greater than, a
+	      symmetric key strength of 112 bits</h:i>] <h:s>that meet the following: 
+	      [<h:b>assignment:</h:b> <h:i>list of standards</h:i>]</h:s>.
+	    </title>
+
+	  </f-element>
+	  
+	</f-component>
+	
+	<!-- 5.5.1.2 FCS_IPSEC_EXT.1 IPsec  -->	
+	<f-component name="IPsec" cc-id="fcs_ipsec_ext.1" id="fcs-ipsec-ext-1">
+	  <consistency-rationale/>
+	  <comp-lev>requires the TSF to securely implement the IPsec protocol.</comp-lev>
+	  <management>The following actions could be considered for the management functions in FMT: <h:ul>
+	  <h:li>Specify VPN gateways to use for connections</h:li>
+	  <h:li>Specify IPsec VPN Clients to use for connections</h:li>
+	  <h:li>Specify IPsec-capable network devices to use for connections</h:li>
+	  <h:li>Specify client credentials to be used for connections</h:li>
+	</h:ul>
+	  </management>
+	  <audit>The following actions should be auditable if FAU_GEN Security Audit Data Generation is included in the
+	  PP/ST: <h:ul>
+	  <h:li>Decisions to DISCARD or BYPASS network packets processed by the TOE</h:li>
+	  <h:li>Failure to establish an IPsec SA</h:li>
+	  <h:li>Establishment/Termination of an IPsec SA</h:li>
+	</h:ul>
+	  </audit>
+	  <dependencies>
+	    <no-link>FCS_CKM.1</no-link> Cryptographic Key Generation<h:br/><h:br/>
+	    <no-link>FCS_CKM.2</no-link> Cryptographic Key Distribution<h:br/><h:br/>
+	    <no-link>FCS_COP.1</no-link> Cryptographic Operation<h:br/><h:br/>
+	  </dependencies>
+	  <f-element id="fcs-ipsec-ext-1e1">
+            <title>The TSF shall implement the IPsec architecture as specified in RFC 4301.
+            </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e2">
+            <title>The TSF shall implement 
+	    <selectables>
+	      <selectable>tunnel mode</selectable>
+	      <selectable>transport mode</selectable>
+	      </selectables>.
+            </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e3">
+            <title>The TSF shall have a nominal, final entry in the SPD that matches anything that
+	    is otherwise unmatched, and discards it.
+            </title>
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e4">
+            <title>The TSF shall implement the IPsec protocol ESP as defined by RFC 4303 using the cryptographic algorithms
+	    [<h:i>AES-GCM-128, AES-GCM-256 as specified in RFC 4106,</h:i>
+	    <selectables>
+              <selectable exclusive="yes">no other algorithms</selectable>
+              </selectables>].
+            </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e5">
+            <title>The TSF shall implement the protocol:
+            <selectables linebreak="yes">
+              <selectable>IKEv1, using Main Mode for Phase I exchanges, as defined in RFCs 2407,
+	      2408, 2409, RFC 4109, 
+	      <selectables>
+		<selectable>RFC 4304 for extended sequence numbers</selectable>
+		</selectables>, 
+		<selectables>
+		  		  <selectable>RFC 4868 for hash functions</selectable>
+		  </selectables>, and 
+		  <selectables>
+		    <selectable exclusive="yes">no support for XAUTH</selectable>
+	      </selectables></selectable>
+              <selectable>IKEv2 as defined in RFC 7296 (with mandatory support for NAT traversal as
+	      specified in section 2.23), RFC 8784, RFC 8247, and 
+	      <selectables>
+		<selectable>RFC 4868 for hash functions</selectable>
+	      </selectables></selectable>
+              </selectables>.
+            </title>
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e6">
+            <title>The TSF shall ensure the encrypted payload in the 
+	    <selectables>
+	      <selectable>IKEv1</selectable>
+	      <selectable>IKEv2</selectable>
+	    </selectables> 
+	    protocol uses the cryptographic algorithms <h:i>AES-CBC-128, AES-CBC-256 as specified in RFC 6379 and </h:i>
+	    <selectables>
+	      <selectable>AES-GCM-128 as specified in RFC 5282</selectable>
+	      <selectable>AES-GCM-256 as specified in RFC 5282</selectable>
+	      </selectables>.
+            </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e7"> 
+            <title>The TSF shall ensure that 
+	    <selectables>
+	      <selectable>IKEv2 SA lifetimes can be configured by 
+	      <selectables>
+		<selectable>an Administrator</selectable>
+		<selectable>a VPN Gateway</selectable>
+	      </selectables> 
+	      based on 
+	      <selectables>
+		<selectable>number of packets/number of bytes</selectable>
+	      <selectable>length of time</selectable></selectables></selectable>
+	      </selectables>. 
+	      If length of time is used, it must include at least one option that
+	      is 24 hours or less for Phase 1 SAs and 8 hours or less for Phase 2 SAs.
+            </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e8">
+            <title>
+              The TSF shall ensure that IKE protocols implement DH Groups <h:ul>
+              <h:li><h:b>19 (256-bit Random ECP), 20 (384-bit Random ECP) according to RFC 5114 and</h:b></h:li></h:ul> 
+              <selectables linebreak="yes">
+		<selectable><selectables>
+		  <selectable>14 (2048-bit MODP)</selectable>
+		  <selectable>15 (3072-bit MODP)</selectable>
+		  <selectable>16 (4096-bit MODP)</selectable>
+		  <selectable>17 (6144-bit MODP)</selectable>
+		  <selectable>18 (8192-bit MODP)</selectable>
+		</selectables> according to RFC 3526</selectable>
+		<selectable><selectables>
+		  <selectable>21 (521-bit Random ECP)</selectable>
+		  <selectable>24 (2048-bit MODP with 256-bit POS</selectable>
+		</selectables> according to RFC 5114</selectable>
+		</selectables>.
+            </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e9">
+            <title>The TSF shall generate the secret value x used in the
+            IKE DH key exchange (“x” in g^x mod p) using the random bit
+            generator specified in FCS_RBG_EXT.1, and having a length of at least
+            <assignable>(one or more) numbers of bits that is at least twice the “bits of
+            security” value associated with the negotiated DH group as listed in
+            Table 2 of NIST SP 800-57, Recommendation for Key Management – Part 1:
+            General</assignable> bits.
+            </title>
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e10">
+            <title>The TSF shall generate nonces used in IKE exchanges in a manner such that the
+	    probability that a specific nonce value will be repeated during the life a specific
+	    IPsec SA is less than 1 in 2^<assignable>(one or more) “bits of security” values
+	    associated with the negotiated DH group as listed in Table 2 of NIST
+	    SP 800-57, Recommendation for Key Management – Part 1: General</assignable>.
+            </title>
+	  </f-element>
+	  
+	  
+	  <f-element id="fcs-ipsec-ext-1e11">
+            <title>The TSF shall ensure that all IKE protocols perform peer authentication using  
+	    <selectables>
+	      <selectable>RSA</selectable>
+	      <selectable>ECDSA</selectable>
+	    </selectables> 
+	    that use X.509v3 certificates that conform to RFC 4945 and 
+	    <selectables>
+	      <selectable id="sel-ipsec-e11-psk">Pre-shared keys</selectable>
+	      <selectable id="sel-ipsec-e11-pskeap">Pre-shared Keys transmitted via EAP-TLS</selectable>
+	      <selectable id="sel-ipsec-e11-pskeapma">Pre-shared Keys transmitted via EAP-TTLS with mutual authentication</selectable>
+	      </selectables>.
+            </title>
+	    <!-- QQQQ: This element needs to be rewritten to be more clear. According to the AppNote below, the 
+		 the "Pre-shared keys" selection applies only to IKEv1 and the other two refer to IKEv2, so they
+		 should be conditional on the selection in IPSEC.1.5. The note below also refers to an RFC without
+		 identifying it, and says that IKEv1 can use any method specified in the RFC. If it's the RFC 
+		 I'm thinking of, it says IKE can use EAP or the native IKE method. But if it's referring to an
+		 older RFC, maybe this is not the case. -->
+	    <!-- QQQQ: Comment from Al on IPsec suggests includiong refrence to "as updated by RFC 8603" for CNSA crypto. --> 
+	    <!-- QQQQ: Al also suggests specifying the ECDSA curves allowed. Maybe this seleciton should refer to another 
+		 SFR where that stuff is layed out.  -->
+            <ext-comp-def-title>
+              <title>The TSF shall ensure that all IKE protocols perform peer authentication using a 
+	      <selectables>
+		<selectable>RSA</selectable>
+		<selectable>ECDSA</selectable>
+	      </selectables> 
+	      that use X.509v3 certificates that conform to RFC 4945 and 
+	      <selectables>
+		<selectable>Pre-shared keys</selectable>
+		<selectable>Pre-shared Keys transmitted via EAP-TLS</selectable>
+		<selectable>Pre-shared Keys transmitted via EAP-TTLS with mutual authentication</selectable>
+		<selectable>no other method</selectable>
+		</selectables>.
+              </title>
+            </ext-comp-def-title>
+            
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e12">
+	    <title>The TSF shall not establish an SA if the <selectables>
+	    <selectable>IP address</selectable>
+	    <selectable>Fully Qualified Domain Name (FQDN)</selectable>
+	    <selectable>user FQDN</selectable>
+	    <selectable>Distinguished Name (DN)</selectable>
+	  </selectables> 
+	  and 
+	  <selectables>
+	    <selectable><assignable>other supported reference identifier types</assignable></selectable>
+	    </selectables> contained in a certificate does not match the expected values for the
+	    entity attempting to establish a connection.
+	    </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e13">
+	    <title>The TSF shall not establish an SA if the presented identifier does not match the
+	    configured reference identifier of the peer.
+	    </title>
+
+	  </f-element>
+	  <f-element id="fcs-ipsec-ext-1e14">
+	    <title>The 
+	    <selectables>
+	      <selectable>TSF</selectable>
+	      <selectable>VPN Gateway</selectable>
+	      </selectables> shall be able to ensure by default that the strength of the symmetric algorithm (in terms 
+	      of the number of bits in the key) negotiated to protect the 
+	      <selectables>
+		<selectable>IKEv1 Phase 1</selectable>
+		<selectable>IKEv2 IKE_SA</selectable>
+	      </selectables> 
+	      connection is greater than or equal to the strength of the symmetric algorithm
+	      (in terms of the number of bits in the key) negotiated to protect the 
+	      <selectables>
+		<selectable>IKEv1 Phase 2</selectable>
+		<selectable>IKEv2 CHILD_SA</selectable>
+		</selectables> connection.
+	    </title>
+
+	  </f-element>
+	  <audit-event>
+	    <audit-event-descr>Decisions to DISCARD or BYPASS network packets processed by the TOE.</audit-event-descr>
+	    <audit-event-info>Presumed identity of source subject.</audit-event-info>
+	    <audit-event-info>The entry in the SPD that applied to the decision.</audit-event-info>
+	  </audit-event>
+	  <audit-event>
+	    <audit-event-descr>Failure to establish an IPsec SA.</audit-event-descr>
+	    <audit-event-info>Identity of destination subject.</audit-event-info>
+	    <audit-event-info>Reason for failure.</audit-event-info>
+	  </audit-event>
+	  <audit-event>
+	    <audit-event-descr>Establishment/Termination of an IPsec SA.</audit-event-descr>
+	    <audit-event-info>Identity of destination subject.</audit-event-info>
+	    <audit-event-info>Transport layer protocol, if applicable.</audit-event-info>
+	    <audit-event-info>Source subject service identifier, if applicable.</audit-event-info>
+	    <audit-event-info>Non-TOE endpoint of connection (IP address) for both successes and failures.</audit-event-info>
+	  </audit-event>
+	</f-component>
+      </section>  <!-- FCS -->
+
+
+          <f-component cc-id="fcs_ckm.2" id="md-fcs-ckm-2-1" name="Cryptographic Key Establishment" iteration="UNLOCKED">
+            <consistency-rationale>The ST author is instructed to make specific selections at minimum to
+              address VPN client requirements; the SFR behavior itself is
+              unmodified.</consistency-rationale>
+            <f-element id="md-fcs-ckm-2e1i1">
+              <title>The TSF shall perform cryptographic key
+                establishment in accordance with a specified key establishment method:
+                <h:ul>
+                  <h:li><h:b>Elliptic curve-based key establishment schemes that meets the following:
+                    NIST Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key
+                    Establishment Schemes Using Discrete Logarithm Cryptography,”</h:b>
+                  </h:li>
+                </h:ul>
+                <selectables linebreak="yes">
+                  <selectable>Finite field-based key establishment schemes that meets the following: NIST
+                    Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key
+                    Establishment Schemes Using Discrete Logarithm Cryptography”</selectable>
+                  <selectable>Key establishment scheme using Diffie-Hellman group 14 that meets the
+                    following: RFC 3526, Section 3</selectable>
+                  <selectable>RSA-based key establishment schemes that meet the following: 
+                    <selectables linebreak="yes">
+                      <selectable>NIST Special Publication 800-56B, “Recommendation for Pair-Wise Key
+                        Establishment Schemes using Integer Factorization Cryptography”</selectable>
+                      <selectable>RSAES-PKCS1-v1_5 as specified in Section 7.2 of RFC 8017,
+                        “Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.2</selectable></selectables></selectable>
+                </selectables>.
+              </title>
+            </f-element>
+            <audit-event/>
+          </f-component>
+      
+
+
+          <f-component cc-id="fcs_cop.1" id="md-fcs-cop-1-1" name="Cryptographic Operation" iteration="ENCRYPT">
+            <f-element id="md-fcs-cop-1e1i1">
+              <title>The TSF shall perform encryption/decryption in accordance with
+                a specified cryptographic algorithm
+                <h:ul>
+                  <h:li>AES-CBC (as defined in FIPS PUB 197, NIST SP 800-38A),</h:li>
+                  <h:li>AES-CCMP (as defined in FIPS PUB 197, NIST SP 800-38C and IEEE 802.11-2012),</h:li>
+                  <h:li><h:b>AES-GCM (as defined in NIST SP 800-38D),</h:b></h:li>
+                </h:ul> and
+                <selectables linebreak="yes">
+                  <selectable>AES Key Wrap (KW) (as defined in NIST SP 800-38F)</selectable>
+                  <selectable>AES Key Wrap with Padding (KWP) (as defined in NIST SP 800-38F)</selectable>
+                  <selectable>AES-CCM (as defined in NIST SP 800-38C)</selectable>
+                  <selectable>AES-XTS (as defined in NIST SP 800-38E)</selectable>
+                  <selectable>AES-CCMP-256 (as defined in NIST SP 800-38C and IEEE 802.11ac-2013)</selectable>
+                  <selectable>AES-GCMP-256 (as defined in NIST SP 800-38D and IEEE 802.11ac-2013)</selectable>
+                </selectables>
+                and cryptographic key sizes 128-bit key sizes and [<h:i>256-bit key sizes</h:i>].
+              </title>
+            </f-element>
+          </f-component>
+	  <!-- 5.5.2.1 User Data Protection -->
+      <section title="User Data Protection (FDP)" id="m-fdp">
+
+	<f-component cc-id="fdp_rip.2" id="fdp-rip-2" name="Full Residual Information Protection">
+	  <consistency-rationale/>
+	  <f-element id="fdp-rip-2e1">
+	    <title> The <h:b>
+	    <selectables onlyone="yes">
+	      <selectable>TOE</selectable>
+	      <selectable>TOE platform</selectable>
+	    </selectables></h:b>  
+	    shall ensure that any previous information content of a resource is made unavailable upon the 
+	    <selectables>
+	      <selectable>allocation of the resource to</selectable>
+	      <selectable>deallocation of the resource from</selectable>
+	      </selectables> all objects.
+	    </title>
+
+	  </f-element>
+
+	</f-component>
+      </section>  <!-- FDP -->
+
+      <!-- 5.5.3 Security Management (FMT)  -->
+      <section title="Security Management (FMT)" id="m-fmt">
+	The TOE is not required to maintain a separate management role. It is, however, required to provide
+	functionality to configure certain aspects of TOE operation that should not be available to the general
+	user population. It is possible for the TOE, TOE Platform, or VPN Gateway to provide this functionality.
+	The client itself has to be configurable - whether it is from the EUD or from a VPN gateway.
+
+	<!-- 5.5.3.1 FMT_SMF.1/VPN Specification of Management Functions (VPN) -->
+	<f-component cc-id="fmt_smf.1" id="fmt-smf-1-vpn" name="Specification of Management Functions (VPN)" iteration="VPN">
+	  <consistency-rationale/>
+	  <f-element id="fmt-smf-1e1-vpn">
+	    <title> The TSF shall be capable of performing the following management functions: 
+	    <selectables linebreak="yes">
+	      <selectable>Specify VPN gateways to use for connections</selectable>
+	      <selectable>Specify IPsec VPN Clients to use for connections</selectable>
+	      <selectable>Specify IPsec-capable network devices to use for connections</selectable>
+	      <selectable>Specify client credentials to be used for connections</selectable>
+	      <selectable>Configure the reference identifier of the peer</selectable>
+	      <selectable><assignable>any additional management functions</assignable></selectable>
+	    </selectables>
+	    </title>
+
+	  </f-element>
+	  <audit-event>
+	    <audit-event-descr>Success or failure of management function.</audit-event-descr>
+	    <audit-event-info>No additional information.</audit-event-info>
+	  </audit-event>
+	</f-component>
+      </section>  <!-- FMT -->
+
+      <!-- 5.5.4 Protection of the TSF (FPT) -->
+      <section title="Protection of the TSF (FPT)" id="m-fpt">
+	
+	<ext-comp-def title="TSF Self-Test" fam-id="FPT_TST_EXT">
+	  <fam-behavior>Components in this family describe requirements for self-test to verify functionality and integrity of the
+	  TOE.</fam-behavior>
+	</ext-comp-def>
+
+	<!-- 5.5.4.1 FPT_TST_EXT.1/VPN TSF Self-Test (VPN Client)  -->
+	<f-component cc-id="fpt_tst_ext.1" id="fpt-tst-ext-1-vpn" name="TSF Self-Test" iteration="VPN">
+	  <consistency-rationale/>
+	  <comp-lev>requires the TOE to perform power on self-tests to verify its functionality and
+	  the integrity of its stored executable code.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>There are no auditable events foreseen.</audit>
+	  <dependencies>No dependencies.</dependencies>
+	  <f-element id="fpt-tst-ext-1e1-vpn">
+	    <title>
+	      The 
+	      <selectables onlyone="yes">
+		<selectable>TOE</selectable>
+		<selectable>TOE platform</selectable>
+	      </selectables> 
+	      shall run a suite of self tests during initial start-up (on power on) to demonstrate the correct 
+	      operation of the TSF.
+	    </title>
+	  </f-element>
+	  <f-element id="fpt-tst-ext-1e2-vpn">
+	    <title>
+	      The 
+	      <selectables onlyone="yes">
+		<selectable>TOE</selectable>
+		<selectable>TOE platform</selectable>
+	      </selectables> 
+	      shall provide the capability to verify the integrity of stored TSF executable code when it is loaded 
+	      for execution through the use of the 
+	      <assignable>cryptographic services provided either by the portion
+	      of the TOE described by the Base-PP or by the OE</assignable>.
+	    </title>
+
+	  </f-element>
+
+	</f-component>
+      </section>   <!-- FPT -->
+    </man-sfrs>
+
+    <!-- <mod-sars> -->
+    <!-- 5.7 TOE Security Assurance Requirements -->
+    <!--	<section title="TOE Security Assurance Requirements" id="s-sar">  
+	
+	<description>
+	This PP-Module does not define any SARs beyond those defined within the Base-PPs to which it can
+	claim conformance. It is important to note that a TOE that is evaluated against this PP-Module is
+	inherently evaluated against the GPOS PP, MDF PP, App PP, or MDM PP as well. These PPs include a
+	number of EAs associated with both SFRs and SARs. Additionally, this
+	PP-Module includes a number of SFR-based EAs that similarly refine the SARs of the Base-PPs. The
+	evaluation laboratory will evaluate the TOE against the chosen Base-PP and supplement that evaluation
+	with the necessary SFRs that are taken from this PP-Module.
+	</description>
+	</section> -->
+    <!-- </mod-sars>  -->
+
+    <!-- Appendix A: Optional Requirements -->
+    <!--
+	As indicated in the introduction to this PP-Module, the baseline requirements (those that must be
+	performed by the TOE) are contained in the body of this PP-Module. This Appendix contains three other
+	types of optional requirements that may be included in the ST but are not required in order to conform
+	to this PP-Module.
+	The first type (in A.1) are strictly optional requirements that are independent of the TOE implementing
+	any function. If the TOE fulfills any of these requirements or supports a certain functionality, the vendor
+	is encouraged but not required to add the related SFRs.
+	The second type (in A.2) are objective requirements that describe security functionality not yet widely
+	available in commercial technology. The requirements are not currently mandated in the body of this
+	PP-Module, but will be included in the baseline requirements in future versions of this PP-Module.
+	Adoption by vendors is encouraged and expected as soon as possible.
+	The third type (in A.3) are implementation-dependent requirements that are dependent on the TOE
+	implementing a particular function. If the TOE fulfills any of these requirements, the vendor must either
+	add the related SFR or disable the functionality for the evaluated configuration.
+    -->
+
+    <!-- A.1: Strictly Optional Requirements -->
+    <opt-sfrs>
+      
+      <section id="sop-audit-table" title="Auditable Events for Strictly Optional SFRs">
+	<audit-table id="at-optional" table="optional">
+	  <h:br/><h:b><ctr ctr-type="Table" pre="Table " id="atref-optional">: Auditable Events for Strictly Optional SFRs</ctr></h:b>
+	</audit-table>
+      </section>
+
+      <section title="Identification and Authentication (FIA)" id="o-fia">
+	The TOE may support leveraging the biometric API provided by the platform.
+	
+	<ext-comp-def title="Biometric Activation" fam-id="FIA_BMA_EXT">
+	  <fam-behavior>Components in this family describe the requirements for biometrics when using the VPN client.</fam-behavior>
+	</ext-comp-def>
+
+
+	<f-component cc-id="fia_bma_ext.1" id="fia-bma-ext-1" name="Biometric Activation">
+	  <consistency-rationale/>
+	  <comp-lev>defines the use of biometrics when using the VPN client.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <f-element id="fia-bma-ext-1e1">
+	    <title>
+	      The TSF shall leverage the platform biometric features to confirm the user before initiating a trusted channel.
+	    </title>
+
+
+
+	  </f-element>
+
+	</f-component>
+      </section>
+
+      <section title="Packet Filtering (FPF)" id="s-fpf">
+	<class-description>
+	  This class contains families that describe packet filtering behavior. Packet filtering refers to the notion that
+	  network traffic that is transmitted “through” the TOE (i.e. the source and destination of the traffic is not
+	  the TOE but the TOE is on the routing path between these two entities) can be treated differently by the
+	  TSF based on attributes associated with the traffic. As this class is defined solely to contain an extended
+	  component defined for this PP-Module, it has one family, FPF_MFA_EXT.
+	</class-description>
+	<ext-comp-def title="Multifactor Authentication Filtering" fam-id="FPF_MFA_EXT">
+	  <fam-behavior>Components in this family describe the requirements for multifactor authentication filtering when using the VPN client.</fam-behavior>
+	</ext-comp-def>
+	<f-component cc-id="fpf_mfa_ext.1" id="fpf-mfa-ext-1" name="Multifactor Authentication Filtering">
+	  
+	  <consistency-rationale/>
+	  <comp-lev>defines the use and composition of multifactor authentication filtering.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <f-element id="fpf-mfa-ext-1e1">
+	    <title>
+	      The TSF shall not forward packets to the internal network until the IKE/IPsec tunnel has been established, 
+	    except those necessary to ensure that the client is authenticated according to FIA_PSK_EXT.1.</title>
+
+
+
+	  </f-element>
+
+
+
+	</f-component>
+      </section>
+
+
+    </opt-sfrs>
+
+    <!-- Appendix B: Selection-Based Requirements -->
+    <!--	  As indicated in the introduction to this PP-Module, the baseline requirements (those that must be
+	performed by the TOE or its underlying platform) are contained in the body of this PP-Module. There are
+	additional requirements based on selections in the body of the PP-Module: if certain selections are
+	made, then additional requirements below will need to be included.  -->
+
+    <sel-sfrs>
+      <section id="sb-audit-table" title="Auditable Events for Selection-based SFRs">
+	<audit-table id="at-selbased" table="sel-based">
+	  <h:br/><h:b><ctr ctr-type="Table" pre="Table " id="atref-sel-based">: Auditable Events for Selection-based SFRs</ctr></h:b>
+	</audit-table>
+      </section>
+
+
+      <section title="Cryptographic Support (FCS)" id="s-fcs">
+	
+	
+	<ext-comp-def title="EAP-TLS" fam-id="FCS_EAP_EXT">
+	  <fam-behavior>Components in this family describe the requirements for EAP-TLS.</fam-behavior>
+	</ext-comp-def>
+
+	<!-- FCS_EAP_EXT.1 EAP TLS -->
+	<f-component cc-id="fcs_eap_ext.1" id="fcs-eap-ext-1" name="EAP-TLS">
+	  <depends on-sel="sel-ipsec-e11-psk" also="sel-ipsec-e11-pskeap" and="sel-ipsec-e11-pskeapma"/>
+	  <!-- QQQQ: The latter two dependencies apply to IKEv2 and are correct. The first dependency applies only
+	       to IKEv1, and the AppNote in IPSEC.1.11 says you can use one of the mechanisms listed in the RFC, one of which
+	       is EAP, but it could use a native IKE method, in which case this SFR should not be included. 
+	       Which RFC is this referring to? Is this selection correct? There is no time to find out
+	       the right answer, so I'm leaving it as is. -->
+	  <consistency-rationale/>
+	  <comp-lev>defines the use of EAP-TLS.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <dependencies>FCS_IPSEC_EXT.1 IPsec</dependencies>
+	  <f-element id="fcs-eap-ext-1e1">
+	    <title>
+	      The TSF shall implement
+	      <selectables>
+		<selectable>EAP-TLS protocol as specified in RFC 5216</selectable>
+		<selectable>EAP-TTLS as specified in RFC 5881</selectable>
+	      </selectables>
+	      as updated by RFC 8996 with TLS implemented using mutual authentication in accordance with the TLS functional package.
+	    </title>
+	  </f-element>
+	  <f-element id="fcs-eap-ext-1e2">
+	    <title>
+	      The TSF shall generate random values used in the
+	      <selectables>
+		<selectable>EAP-TLS</selectable>
+		<selectable>EAP-TTLS</selectable>
+	      </selectables>
+	      exchange using the RBG specified in FCS_RBG_EXT.1.
+	    </title>
+	  </f-element>
+	  <f-element id="fcs-eap-ext-1e3">
+	    <title>
+	      The TSF shall support peer authentication using certificates and
+	      <selectables>
+		<selectable>PSK</selectable>
+		<selectable>HOTP</selectable>
+		<selectable>TOTP</selectable>
+		<selectable><assignable>other Authentication-verification protocols</assignable></selectable>
+	      </selectables>
+	      as updated by RFC 8996 with TLS implemented using mutual authentication in accordance with the TLS functional package.
+	    </title>
+
+	  </f-element>
+
+
+	  <f-element id="fcs-eap-ext-1e4">
+	    <title>
+	      The TSF shall use the MSK from the 
+	      <selectables>
+		<selectable>EAP-TLS</selectable>
+		<selectable>EAP-TTLS</selectable>
+		</selectables> response as the IKEv2 shared secret in the authentication payload.
+	    </title>
+	  </f-element>
+
+
+	</f-component>
+
+      </section>
+
+      <!-- B.2 Identification and Authentication (FIA) -->
+      <section title="Identification and Authentication (FIA)" id="s-fia">
+	The TOE may support pre-shared keys for use in the IPsec protocol, and may use pre-shared keys in other protocols as well.  
+	PSK in the context of this document refer to generated values, memorized values subject to conditioning, one-time passwords, 
+	and combinations of the above as described in FIA_PSK_EXT.1.2.
+	
+	
+	<ext-comp-def title="HMAC-Based One-Time Password Pre-Shared Keys" fam-id="FIA_HOTP_EXT">
+	  <fam-behavior>Components in this family define requirements for use of HMAC-Based One-Time password authentication, including
+	  generation methods and usage restrictions.</fam-behavior>
+	</ext-comp-def>
+	<f-component cc-id="fia_hotp_ext.1" id="fia-hotp-ext-1" name="HMAC-Based One-Time Password Pre-Shared Keys">
+	  <depends on-sel="sel-verify-hotp"/>
+	  <consistency-rationale/>
+	  <comp-lev> defines the implementation of HOTP.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <dependencies>FIA_PSK_EXT.4 HMAC-Based One-Time Password Pre-shared Keys Support</dependencies>
+	  <f-element id="fia-hotp-ext-1e1">
+	    <title>
+	      The TSF shall support HMAC-Based One-Time Password authentication (HOTP) in accordance with RFC 4226 
+	      to authenticate the user before establishing VPN connection. 
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e2">
+	    <title>
+	      The TSF shall generate an HOTP seed according to FCS_RBG_EXT.1 of 
+	      <selectables>
+		<selectable>128</selectable>
+		<selectable>256</selectable>
+		</selectables> bits.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e3">
+	    <title>The TSF shall generate a new HOTP seed value for each client.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e4">
+	    <title>
+	      The TSF shall use
+	      <selectables>
+		<selectable>SHA-1</selectable>
+		<selectable>SHA-256</selectable>
+		<selectable>SHA-384</selectable>
+		<selectable>SHA-512</selectable>
+		</selectables> with key sizes 
+		<assignable>key size (in bits) used in HMAC</assignable> and message digest sizes 
+		<selectables>
+		  <selectable>160</selectable>
+		  <selectable>256</selectable>
+		  <selectable>384</selectable>
+		  <selectable>512</selectable>
+		  </selectables> to derive an HOTP hash from the HOTP seed and counter.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e5">
+	    <title>
+	      The TSF shall truncate the HOTP hash per FIA_HOTP_EXT.1.4 to create an HOTP of  
+	      <selectables>
+		<selectable>administrator configurable character length of at least 6</selectable>
+		<selectable>non-configurable character length of
+		<selectables onlyone="yes">
+		  <selectable>6</selectable>
+		  <selectable>7</selectable>
+		  <selectable>8</selectable>
+		  <selectable>9</selectable>
+		  <selectable>10</selectable>
+		</selectables>
+		</selectable>
+		</selectables>.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e6">
+	    <title>
+	      The TSF shall 
+	      <selectables>
+		<selectable>throttle invalid requests to 
+		<selectables>
+		  <selectable>administrator configurable value</selectable>
+		</selectables> per minute</selectable>
+		<selectable>lock the associated account after 
+		<selectables>
+		  <selectable>administrator configurable value</selectable>
+		  </selectables> failed attempts until 
+		  <selectables>
+		    <selectable>an administrator unlocks the account</selectable>
+		  </selectables>
+		</selectable>
+		</selectables>.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e7">
+	    <title>
+	      The TSF shall not verify HOTP attempts outside of the counter look ahead window of 
+	      <selectables>
+		<selectable>a configurable value</selectable>
+		</selectables> for resynchronization.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-hotp-ext-1e8">
+	    <title>
+	      The TSF shall increment the counter after each successful authentication.
+	    </title>
+
+
+
+	  </f-element>
+
+	</f-component>
+
+	<ext-comp-def title="Pre-Shared Key Composition" fam-id="FIA_PSK_EXT">
+	  <fam-behavior>Components in this family describe the requirements for pre-shared keys when implementing IPsec.</fam-behavior>
+	</ext-comp-def>
+
+	<!-- FIA_PSK_EXT.1 Pre-Shared Key Composition -->
+	<f-component cc-id="fia_psk_ext.1" id="fia-psk-ext-1" name="Pre-Shared Key Composition">
+	  <depends on-sel="sel-ipsec-e11-psk" and="sel-ipsec-e11-pskeap" also="sel-ipsec-e11-pskeapma"/>
+	  <consistency-rationale/>
+	  <comp-lev>defines the use and composition of pre-shared keys used for IPsec.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <dependencies>FCS_IPSEC_EXT.1 IPsec</dependencies>
+	  <f-element id="fia-psk-ext-1e1">
+	    <title>
+	      The TSF shall be able to use pre-shared keys for IPsec and 
+	      <selectables>
+		<selectable exclusive="yes">no other protocols</selectable>
+		</selectables>.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-1e2">
+	    <title>
+	      The TSF shall be able to accept the following as pre-shared keys: 
+	      <selectables>
+		<selectable id="pskgen">generated bit-based</selectable>
+		<selectable id="pskpw">password-based</selectable>
+		<selectable id="pskhotp">HMAC-based one-time password</selectable>
+		<selectable id="psktotp">time-based one-time password</selectable>
+		<selectable id="pskgenhotp">combination of a generated bit-based and HMAC-based one-time password</selectable>
+		<selectable id="pskgentotp">combination of a generated bit-based and time-based one-time password</selectable>
+		<selectable id="pskpwhotp">combination of a password-based and HMAC-based one-time password</selectable>
+		<selectable id="pskpwtotp">combination of a password-based and time-based one-time password</selectable>
+		</selectables> keys.
+	    </title>
+	    <ext-comp-def-title><title>
+	      The TSF shall be able to accept the following as pre-shared keys: 
+	      <selectables>
+		<selectable>generated bit-based</selectable>
+		<selectable>password-based</selectable>
+		<selectable>HMAC-based one-time password</selectable>
+		<selectable>time-based one-time password</selectable>
+		<selectable>combination of a generated bit-based and HMAC-based one-time password</selectable>
+		<selectable>combination of a generated bit-based and time-based one-time password</selectable>
+		<selectable>combination of a password-based and HMAC-based one-time password</selectable>
+		<selectable>combination of a password-based and time-based one-time password</selectable>
+		</selectables> keys.
+	    </title></ext-comp-def-title>
+
+	  </f-element>
+
+
+
+	</f-component>
+	<f-component cc-id="fia_psk_ext.2" id="fia-psk-ext-2" name="Generated Pre-Shared Keys">
+	  <depends on-sel="pskgen"/>
+	  <depends on-sel="pskgenhotp"/>
+	  <depends on-sel="pskgentotp"/>
+	  <consistency-rationale/>
+	  <comp-lev>defines the use and composition of generated pre-shared keys used for IPsec.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>The following actions should be auditable if FAU_GEN Security Audit Data Generation is included in the
+	  PP/ST:<h:ul>
+	  <h:li>Failure of the randomization process</h:li>
+	</h:ul>
+	  </audit>
+	  <dependencies>FIA_PSK_EXT.1</dependencies>
+	  <f-element id="fia-psk-ext-2e1">
+	    <title>
+	      The TSF shall be able to 
+	      <selectables>
+		<selectable>accept externally generated pre-shared keys</selectable>
+		<selectable>
+		  generate 
+		  <selectables>
+		    <selectable>128</selectable>
+		    <selectable>256</selectable>
+		    </selectables> bit-based pre-shared keys via FCS_RBG_EXT.1. 
+
+		</selectable>
+		</selectables>.
+	    </title>
+
+	  </f-element>
+
+	</f-component>
+
+	<f-component cc-id="fia_psk_ext.3" id="fia-psk-ext-3" name="Password-Based Pre-Shared Keys">
+	  <depends on-sel="pskpw"/>
+	  <depends on-sel="pskpwhotp"/>
+	  <depends on-sel="pskpwtotp"/>
+	  <consistency-rationale/>
+	  <comp-lev>defines the use and composition of password-based pre-shared keys used for IPsec.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>The following actions should be auditable if FAU_GEN Security Audit Data Generation is included in the
+	  PP/ST:<h:ul>
+	  <h:li>Failure of the randomization process</h:li>
+	</h:ul>
+	  </audit>
+	  <dependencies>FIA_PSK_EXT.1</dependencies>
+	  <f-element id="fia-psk-ext-3e1">
+	    <title>
+	      The TSF shall support a PSK of up to <assignable>positive integer of 64 or more</assignable> characters. 
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-3e2">
+	    <title>The TSF shall allow PSKs to be composed of any combination of upper case characters, 
+	    lower case characters, numbers, and the following special characters: "!", "@", "#", "$", "%", "^", "&amp;", "*", "(", and ")", and 
+	    <selectables>
+	      <selectable exclusive="yes">no other characters</selectable>
+	    </selectables>
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-3e3">
+	    <title>
+	      The TSF shall perform Password-based Key Derivation Functions in accordance with a specified cryptographic algorithm HMAC-<selectables>
+	      <selectable>SHA-256</selectable>
+	      <selectable>SHA-384</selectable>
+	      <selectable>SHA-512</selectable>
+	      </selectables>, with 
+	      <assignable>positive integer of 4096 or more</assignable> iterations, and output cryptographic key sizes 
+	      <selectables>
+		<selectable>128</selectable>
+		<selectable>256</selectable>
+		</selectables> that meet the following: [NIST SP 800-132].
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-3e4">
+	    <title>
+	      The TSF shall not accept PSKs less than 
+	      <selectables>
+		<selectable>a value settable by the administrator</selectable>
+		<selectable><assignable>minimum PSK length accepted by the TOE, must be >= 6</assignable></selectable>
+		</selectables> and greater than the maximum PSK length defined in FIA_PSK_EXT.3.1.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-3e5">
+	    <title>
+	      The TSF shall generate all salts using an RBG that meets FCS_RBG_EXT.1 and with entropy of <assignable>value equal to or greater than 128</assignable> bits.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-3e6">
+	    <title>
+	      The TSF shall require the PSK to be entered before every initiated connection.
+	    </title>
+	  </f-element>
+
+	  <f-element id="fia-psk-ext-3e7">
+	    <title>
+	      The TSF shall 
+	      <selectables>
+		<selectable>provide a password strength meter</selectable>
+		<selectable>check the password against a denylist</selectable>
+		</selectables>. 
+	    </title>
+
+
+
+	  </f-element>
+
+	</f-component>
+
+	<f-component cc-id="fia_psk_ext.4" id="fia-psk-ext-4" name="HMAC-Based One-Time Password Pre-shared Keys Support">
+	  <depends on-sel="pskhotp"/>
+	  <depends on-sel="pskgenhotp"/>
+	  <depends on-sel="pskpwhotp"/>
+	  <consistency-rationale/>
+	  <comp-lev>defines the use and composition of HOTP pre-shared keys used for IPsec.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <dependencies>FIA_PSK_EXT.1</dependencies>
+	  <f-element id="fia-psk-ext-4e1">
+	    <title>
+	      The TSF shall accept and send an HOTP while initiating a VPN connection.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-4e2">
+	    <title>
+	      The TSF shall <selectables onlyone="yes">
+	      <selectable id="sel-verify-hotp">verify the HOTP</selectable>
+	      <selectable>verify the HOTP via an external authentication server</selectable>
+	      </selectables> before establishing an incoming connection.
+	    </title>
+	    <ext-comp-def-title><title>
+	      The TSF shall <selectables onlyone="yes">
+	      <selectable>verify the HOTP</selectable>
+	      <selectable>verify the HOTP via an external authentication server</selectable>
+	      </selectables> before establishing an incoming connection.
+	    </title></ext-comp-def-title>
+
+
+	  </f-element>
+
+	</f-component>
+
+	<f-component cc-id="fia_psk_ext.5" id="fia-psk-ext-5" name="Time-Based One-Time Password Pre-shared Keys Support">
+	  <depends on-sel="psktotp"/>
+	  <depends on-sel="pskgentotp"/>
+	  <depends on-sel="pskpwtotp"/>
+	  <consistency-rationale/>
+	  <comp-lev>defines the use and composition of TOTP pre-shared keys used for IPsec.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <dependencies>FIA_PSK_EXT.1</dependencies>
+	  <f-element id="fia-psk-ext-5e1">
+	    <title>
+	      The TSF shall accept and send a TOTP while initiating a VPN connection.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-psk-ext-5e2">
+	    <title>
+	      The TSF shall 
+	      <selectables onlyone="yes">
+		<selectable id="sel-psk5-ext-e2-verify">verify the TOTP</selectable>
+		<selectable>verify the TOTP via an external authentication server</selectable>
+		</selectables> before establishing an incoming connection.
+	    </title>
+	    <ext-comp-def-title><title>
+	      The TSF shall 
+	      <selectables onlyone="yes">
+		<selectable>verify the TOTP</selectable>
+		<selectable>verify the TOTP via an external authentication server</selectable>
+		</selectables> before establishing an incoming connection.
+	    </title></ext-comp-def-title>
+
+
+	  </f-element>
+
+	</f-component>
+
+
+	<ext-comp-def title="Time-Based One-Time Password Pre-Shared Keys" fam-id="FIA_TOTP_EXT">
+	  <fam-behavior>Components in this family define requirements for use of Time-Based One-Time password authentication, including generation
+	  methods and usage restrictions.</fam-behavior>
+	</ext-comp-def>
+	<f-component cc-id="fia_totp_ext.1" id="fia-totp-ext-1" name="Time-Based One-Time Password Pre-Shared Keys">
+	  <depends on-sel="sel-psk5-ext-e2-verify"/>
+	  <consistency-rationale/>
+	  <comp-lev> defines the implementation of TOTP.</comp-lev>
+	  <management>No specific management functions are identified.</management>
+	  <audit>No specific audit functions are identified.
+	  </audit>
+	  <dependencies>FIA_PSK_EXT.5 Time-Based One-Time Password Pre-shared Keys Support</dependencies>
+	  <f-element id="fia-totp-ext-1e1">
+	    <title>
+	      The TSF shall support Time-Based One-Time Password (TOTP) authentication in accordance with RFC 6238 
+	      to authenticate the user before establishing VPN connection. 
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e2">
+	    <title>
+	      The TSF shall generate a TOTP seed according to FCS_RBG_EXT.1 of 
+	      <selectables>
+		<selectable>128</selectable>
+		<selectable>256</selectable>
+		</selectables> bits.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e3">
+	    <title>The TSF shall generate a new TOTP seed for each client.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e4">
+	    <title>
+	      The TSF shall use 
+	      <selectables>
+		<selectable>SHA-1</selectable>
+		<selectable>SHA-256</selectable>
+		<selectable>SHA-384</selectable>
+		<selectable>SHA-512</selectable>
+		</selectables> with key sizes 
+		<assignable>key size (in bits) used in HMAC</assignable> and message digest sizes 
+		<selectables>
+		  <selectable>160</selectable>
+		  <selectable>256</selectable>
+		  <selectable>384</selectable>
+		  <selectable>512</selectable>
+		  </selectables> to derive a TOTP hash from the TOTP seed and current time provided by NTP.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e5">
+	    <title>
+	      The TSF shall truncate the TOTP hash per FIA_TOTP_EXT.1.4 to create a TOTP of  
+	      <selectables>
+		<selectable exclusive="yes">administrator configurable character length of at least 6</selectable>
+		</selectables>.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e6">
+	    <title>
+	      The TSF shall
+	      <selectables>
+		<selectable>throttle invalid requests to 
+		<selectables>
+		  <selectable>administrator configurable value</selectable>
+		</selectables> per minute</selectable>
+		<selectable>lock the associated account after 
+		<selectables>
+		  <selectable>administrator configurable value</selectable>
+		  </selectables> failed attempts until 
+		  <selectables>
+		    <selectable>an administrator unlocks the account</selectable>
+		  </selectables>
+		</selectable>
+		</selectables>.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e7">
+	    <title>
+	      The TSF shall set a time-step size of 
+	      <selectables onlyone="yes">
+		<selectable exclusive="yes"><assignable>a value less than or equal to 30</assignable></selectable>
+		</selectables> seconds.
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e8">
+	    <title>
+	      The TSF shall not validate a drift of more than 
+	      <selectables onlyone="yes">
+		<selectable exclusive="yes"><assignable>a value less than or equal to 3</assignable></selectable>
+		</selectables> time-steps.            
+	    </title>
+	  </f-element>
+	  <f-element id="fia-totp-ext-1e9">
+	    <title>
+	      The TSF shall 
+	      <selectables onlyone="yes">
+		<selectable exclusive="yes">not permit resynchronization</selectable>
+		</selectables>.           
+	    </title>
+
+
+
+	  </f-element>
+
+	</f-component>
+
+
+      </section>
+
+
+    </sel-sfrs>
+
+
+    <!-- Appendix A.2: Objective Requirements -->
+    <!-- <obj-sfrs> -->
+
+    <!--   <section id="sob-audit-table" title="Auditable Events for Objective SFRs"> -->
+    <!-- 	<audit-table id="at-obj" table="objective"> -->
+    <!-- 	  <h:br/><h:b><ctr ctr-type="Table" pre="Table " id="atref-objective">: Auditable Events for Objective SFRs</ctr></h:b> -->
+    <!-- 	</audit-table> -->
+    <!--   </section> -->
+
+    <!--   <!-\- Appendix A.2.1 Security Audit (FAU) -\-> -->
+    <!--   <section title="Security Audit (FAU)" id="ob-fau"> -->
+	
+    <!-- 	<!-\- A.2.1.1 FAU_GEN.1/VPN Audit Data Generation (VPN Client) -\-> -->
+    <!-- 	<f-component name="Audit Data Generation" cc-id="fau_gen.1" iteration="VPN" id="fau-gen-1-vpn"> -->
+    <!-- 	  <consistency-rationale/> -->
+    <!-- 	  <f-element id="fau-gen-1e1-vpn"> -->
+    <!-- 	    <title> -->
+    <!-- 	      The TSF <h:b>and  -->
+    <!-- 	      <selectables onlyone="yes"> -->
+    <!-- 		<selectable>TOE platform</selectable> -->
+    <!-- 		<selectable>no other component</selectable> -->
+    <!-- 	      </selectables></h:b>  -->
+    <!-- 	      shall be able to generate an audit record of the following auditable events:  -->
+    <!-- 	      <h:ol type="a"> -->
+    <!-- 		<h:li>Start-up and shutdown of the audit functions;</h:li> -->
+    <!-- 		<h:li>All auditable events for the [<h:i>not specified</h:i>] level of audit;</h:li> -->
+    <!-- 		<h:li>All administrative actions;</h:li> -->
+    <!-- 		<h:li>[<h:i>Specifically defined auditable events listed in <h:b>the Auditable Events tables</h:b></h:i>].</h:li> <!-\- TODO: check this reference -\-> -->
+    <!-- 	      </h:ol> -->
+    <!-- 	      <!-\- QQQQ -->
+    <!-- 		   <h:table> -->
+    <!-- 		   <h:caption>Table C-1: Auditable Events</h:caption> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:th>Requirement</h:th> -->
+    <!-- 		   <h:th>Auditable Events</h:th> -->
+    <!-- 		   <h:th>Additional Audit Record Contents</h:th> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>FAU_SEL.1</h:td> -->
+    <!-- 		   <h:td>All modifications to the audit configuration that occur while the audit collection functions are operating.</h:td> -->
+    <!-- 		   <h:td>None.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td rowspan="3">FCS_IPSEC_EXT.1</h:td> -->
+    <!-- 		   <h:td>Decisions to DISCARD or BYPASS network packets processed by the TOE.</h:td> -->
+    <!-- 		   <h:td>Presumed identity of source subject.<h:br/><h:br/> -->
+    <!-- 		   Identity of destination subject.<h:br/><h:br/> -->
+    <!-- 		   Transport layer protocol, if applicable.<h:br/><h:br/> -->
+    <!-- 		   Source subject service identifier, if applicable. -->
+    <!-- 		   <h:br/><h:br/>The entry in the SPD that applied to the decision.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>Failure to establish an IPsec SA.</h:td> -->
+    <!-- 		   <h:td>Reason for failure.<h:br/><h:br/> -->
+    <!-- 		   Non-TOE endpoint of connection (IP address).</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>Establishment/Termination of an IPsec SA.</h:td> -->
+    <!-- 		   <h:td>Non-TOE endpoint of connection (IP address).</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>FCS_RBG_EXT.1</h:td> -->
+    <!-- 		   <h:td>Failure of the randomization process (Optional).</h:td> -->
+    <!-- 		   <h:td>None.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>FDP_RIP.2</h:td> -->
+    <!-- 		   <h:td colspan="2">None.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>FMT_SMF.1/VPN</h:td> -->
+    <!-- 		   <h:td>Success or failure of management function.</h:td> -->
+    <!-- 		   <h:td>None.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td rowspan="2">FPT_TUD_EXT.1</h:td> -->
+    <!-- 		   <h:td>Initiation of the update.</h:td> -->
+    <!-- 		   <h:td>None.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   <h:tr> -->
+    <!-- 		   <h:td>Any failure to verify the integrity of the update.</h:td> -->
+    <!-- 		   <h:td>None.</h:td> -->
+    <!-- 		   </h:tr> -->
+    <!-- 		   </h:table> -->
+    <!-- 	      -\-> -->
+    <!-- 	    </title> -->
+
+    <!-- 	  </f-element> -->
+    <!-- 	  <f-element id="fau-gen-1e2-vpn"> -->
+    <!-- 	    <title>The TSF <h:b>and  -->
+    <!-- 	    <selectables onlyone="yes"> -->
+    <!-- 	      <selectable>TOE platform</selectable> -->
+    <!-- 	      <selectable>no other component</selectable> -->
+    <!-- 	    </selectables></h:b>  -->
+    <!-- 	    shall record within each audit record at least the following information:  -->
+    <!-- 	    <h:ol type="a"> -->
+    <!-- 	      <h:li>Date and time of the event, type of event, subject identity, and the outcome -->
+    <!-- 	      (success or failure) of the event; and</h:li> -->
+    <!-- 	      <h:li>For each audit event type, based on the auditable event definitions of the -->
+    <!-- 	      functional components included in the PP-Module/ST, [<h:i>information -->
+    <!-- 	      specified in column three of  Auditable Events table</h:i>].</h:li> -->
+    <!-- 	    </h:ol> -->
+    <!-- 	    </title> -->
+    <!-- 	  </f-element> -->
+
+    <!-- 	</f-component> -->
+
+    <!-- 	<!-\- A.2.1.2 FAU_SEL.1/VPN Selective Audit (VPN Client) -\-> -->
+    <!-- 	<f-component name="Selective Audit" cc-id="fau_sel.1" iteration="VPN" id="fau-sel-1-vpn"> -->
+    <!-- 	  <consistency-rationale/> -->
+    <!-- 	  <f-element> -->
+    <!-- 	    <title> -->
+    <!-- 	      The <h:b> -->
+    <!-- 	      <selectables onlyone="yes"> -->
+    <!-- 		<selectable>TSF</selectable> -->
+    <!-- 		<selectable>TOE platform</selectable> -->
+    <!-- 	      </selectables></h:b>  -->
+    <!-- 	      shall be able to select the set of events to be audited from the set of all auditable events based on -->
+    <!-- 	      the following attributes: -->
+    <!-- 	      [<h:i>event type, [success of auditable security events, failure of auditable security events],  -->
+    <!-- 	      <assignable>list of additional attributes that audit selectivity is based upon</assignable></h:i>]. -->
+    <!-- 	    </title> -->
+
+    <!-- 	  </f-element> -->
+    <!-- 	  <audit-event> -->
+    <!-- 	    <audit-event-descr>All modifications to the audit configuration -->
+    <!-- 	    that occur while the audit collection functions are operating.</audit-event-descr>  -->
+    <!-- 	    <audit-event-info>No additional information.</audit-event-info> -->
+    <!-- 	  </audit-event> -->
+    <!-- 	</f-component> -->
+    <!--   </section> -->
+
+    <!-- <impl-dep-sfrs> -->
+      
+      
+    <!--   <!-\- A.2.2 User Data Protection (FDP) -\-> -->
+    <!--   <section id="sib-audit-table" title="Auditable Events for Implementation-Dependent SFRs"> -->
+    <!-- 	<audit-table id="at-feat-based" table="feat-based"> -->
+    <!-- 	  <h:br/><h:b><ctr ctr-type="Table" pre="Table " id="atref-implbased">: Auditable Events for Implementation-Dependent SFRs</ctr></h:b> -->
+    <!-- 	</audit-table> -->
+    <!--   </section> -->
+
+    <!--   <section title="User Data Protection (FDP)" id="ib-fdp"> -->
+	
+    <!-- 	<ext-comp-def title="Subset Information Flow Control" fam-id="FDP_VPN_EXT"> -->
+    <!-- 	  <fam-behavior>Components in this family describe the requirements that pertain to IP traffic and information flow -->
+    <!-- 	  through the VPN client.</fam-behavior> -->
+    <!-- 	</ext-comp-def> -->
+
+    <!-- 	<!-\- FDP_VPN_EXT.1 Split Tunnel Prevention  -\-> -->
+    <!-- 	<f-component cc-id="fdp_vpn_ext.1" id="fdp-vpn-ext-1" name="Split Tunnel Prevention"> -->
+    <!-- 	  <consistency-rationale/> -->
+    <!-- 	  <comp-lev>requires the TSF to process all IP traffic through its VPN client -->
+    <!-- 	  functionality.</comp-lev> -->
+    <!-- 	  <management>No specific management functions are identified.</management> -->
+    <!-- 	  <audit>There are no auditable events foreseen.</audit> -->
+    <!-- 	  <dependencies>FCS_IPSEC_EXT.1 IPsec</dependencies> -->
+    <!-- 	  <f-element id="fdp-vpn-ext-1e1"> -->
+    <!-- 	    <title> -->
+    <!-- 	      The TSF shall ensure that all IP traffic (other than IP traffic required to establish -->
+    <!-- 	      the VPN connection) flow through the IPsec VPN client.  -->
+    <!-- 	    </title> -->
+
+    <!-- 	  </f-element> -->
+
+    <!-- 	</f-component> -->
+    <!--   </section> -->
+    <!-- </impl-dep-sfrs> -->
+  </module>
+	<package>
+	  <git>
+	    <url>https://github.com/commoncriteria/ssh</url>
+	    <branch>release-1.0</branch>
+	    <commit>95832af91e6c8d83e02ec7690c8b35b6357397b1</commit>
+	  </git>
+	  <f-component cc-id="fcs_ssh_ext.1" name="SSH Protocol">
+	    <f-element id="fcs-ssh-ext-1e1">
+	      <title>The TOE shall implement <h:i>SSH</h:i> acting as a
+	      <selectables>
+		<selectable id="ssh-client">client</selectable>
+		<selectable id="ssh-server">server</selectable>
+		</selectables> in accordance with
+		that complies with RFCs 4251, 4252, 4253, 4254,
+		<selectables>
+		  <selectable id="sel-rfc4256">4256</selectable>
+		  <selectable id="sel-rfc4344">4344</selectable>
+		  <selectable id="sel-rfc5647">5647</selectable>
+		  <selectable id="sel-rfc5656">5656</selectable>
+		  <selectable id="sel-rfc6187">6187</selectable>
+		  <selectable id="sel-rfc6668">6668</selectable>
+		  <selectable id="sel-rfc8268">8268</selectable>
+		  <selectable id="sel-rfc8308">8308</selectable>
+		  <selectable id="sel-rfc8332">8332</selectable>
+		  <selectable id="sel-rfc8709">8709</selectable>
+		  <selectable id="sel-rfc8731">8731</selectable>
+		  </selectables> and [<h:i>no other standard</h:i>].
+	      </title>
+
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e2">
+	      <title>
+		The TSF shall ensure that the SSH protocol implementation supports the following authentication methods: 
+		<selectables linebreak="yes">
+		  <selectable>“password” (RFC 4252)</selectable>
+		  <selectable>“keyboard-interactive” (RFC 4256)</selectable> 
+		  <selectable>“publickey” (RFC 4252): 
+		  <selectables linebreak="yes">
+		    <selectable>ssh-rsa (RFC 4253)</selectable>  
+		    <selectable>rsa-sha2-256 (RFC 8332)</selectable> 
+		    <selectable>rsa-sha2-512 (RFC 8332)</selectable> 
+		    <selectable>ecdsa-sha2-nistp256 (RFC 5656)</selectable>  
+		    <selectable>ecdsa-sha2-nistp384 (RFC 5656)</selectable> 
+		    <selectable>ecdsa-sha2-nistp521 (RFC 5656)</selectable>
+		    <selectable>ssh-ed25519 (RFC 8709)</selectable>
+		    <selectable>ssh-ed448 (RFC 8709)</selectable>
+		    <selectable>x509v3-ecdsa-sha2-nistp256 (RFC 6187)</selectable> 
+		    <selectable>x509v3-ecdsa-sha2-nistp384 (RFC 6187)</selectable> 
+		    <selectable>x509v3-ecdsa-sha2-nistp521 (RFC 6187)</selectable>
+		    <selectable>x509v3-rsa2048-sha256  (RFC 6187)</selectable> 
+		  </selectables>
+		  </selectable>
+		  </selectables> and no other methods.
+	      </title>
+
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e3">
+	      <title>
+		The TSF shall ensure that, as described in RFC 4253, packets greater than 
+		<assignable>number of bytes between 35,000 and 1 GB (inclusive)</assignable>
+		in an SSH transport connection are dropped.
+	      </title>
+
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e4">
+	      <title>
+		The TSF shall protect data in transit from unauthorised disclosure using the following mechanisms: 
+		<selectables linebreak="yes">
+		  <selectable>aes128-ctr (RFC 4344)</selectable>  
+		  <selectable>aes256-ctr (RFC 4344)</selectable>
+		  <selectable>aes128-cbc (RFC 4253)</selectable>
+		  <selectable>aes256-cbc (RFC 4253)</selectable>
+		  <selectable>AEAD_AES_128_GCM (RFC 5647)</selectable> 
+		  <selectable>AEAD_AES_256_GCM (RFC 5647)</selectable> 
+		  <selectable>aes128-gcm@openssh.com (RFC 5647)</selectable> 
+		  <selectable>aes256-gcm@openssh.com (RFC 5647)</selectable>
+		  </selectables> and no other mechanisms.
+	      </title>
+
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e5">
+	      <title>
+		The TSF shall protect data in transit from modification, deletion, and insertion using: 
+		<selectables linebreak="yes">
+		  <!--						<selectable>hmac-sha1 (RFC 4253)</selectable>  -->
+		  <selectable>hmac-sha2-256 (RFC 6668)</selectable> 
+		  <selectable>hmac-sha2-512 (RFC 6668)</selectable>
+		  <selectable>AEAD_AES_128_GCM (RFC 5647)</selectable>
+		  <selectable>AEAD_AES_256_GCM (RFC 5647)</selectable>
+		  <selectable>implicit </selectable>
+		  </selectables> and no other mechanisms.
+	      </title>
+
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e6">
+	      <title>
+		The TSF shall establish a shared secret with its peer using: 
+		<selectables linebreak="yes">
+		  <!--						<selectable>diffie-hellman-group14-sha1 (RFC 4253)</selectable>  -->
+		  <selectable>diffie-hellman-group14-sha256 (RFC 8268)</selectable>  
+		  <selectable>diffie-hellman-group15-sha512 (RFC 8268)</selectable>  
+		  <selectable>diffie-hellman-group16-sha512 (RFC 8268)</selectable>  
+		  <selectable>diffie-hellman-group17-sha512 (RFC 8268)</selectable>  
+		  <selectable>diffie-hellman-group18-sha512 (RFC 8268)</selectable> 
+		  <selectable>ecdh-sha2-nistp256 (RFC 5656)</selectable> 
+		  <selectable>ecdh-sha2-nistp384 (RFC 5656)</selectable>
+		  <selectable>ecdh-sha2-nistp521 (RFC 5656)</selectable>  
+		  <selectable>curve25519-sha256 (RFC 8731)</selectable>
+		  <selectable>curve448-sha512 (RFC 8731)</selectable> 
+		  </selectables> and no other mechanisms.
+	      </title>
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e7">
+	      <title>
+		The TSF shall use <h:i>SSH KDF</h:i> as defined in 
+		<selectables linebreak="yes">
+		  <selectable>RFC 4253 (Section 7.2)</selectable> 
+		  <selectable> RFC 5656 (Section 4) </selectable>
+		</selectables>
+		to derive the following cryptographic keys from a shared secret: <h:i>session keys</h:i>.
+	      </title>
+
+
+	    </f-element>
+	    <f-element id="fcs-ssh-ext-1e8">
+	      <title>
+		The TSF shall ensure that 
+		<selectables linebreak="yes">
+		  <selectable>a rekey of the session keys</selectable> 	 
+		  <selectable>connection termination</selectable>
+		</selectables>
+		occurs when any of the following thresholds are met: 
+		<h:ul>
+		  <h:li>one hour connection time</h:li>
+		  <h:li>no more than one gigabyte of transmitted data, or</h:li>
+		  <h:li>no more than one gigabyte of received data.</h:li>
+		</h:ul>
+	      </title>
+
+
+	    </f-element>
+	    <audit-event type="optional">
+	      <audit-event-descr>Failure to establish SSH connection</audit-event-descr>
+	      <audit-event-info>Reason for failure.</audit-event-info>
+	      <audit-event-info type="optional">Non-TOE endpoint of attempted connection (IP Address)</audit-event-info>
+	    </audit-event>
+	    <audit-event type="optional">
+	      <audit-event-descr>Establishment of SSH connection</audit-event-descr>
+	      <audit-event-info type="optional">Non-TOE endpoint of connection (IP Address)</audit-event-info>
+	    </audit-event>
+	    <audit-event type="optional">
+	      <audit-event-descr>Termination of SSH connection session</audit-event-descr>
+	      <audit-event-info type="optional">Non-TOE endpoint of connection (IP Address)</audit-event-info>
+	    </audit-event>
+	    <audit-event type="optional">
+	      <audit-event-descr>Dropping of packet(s) outside defined size limits</audit-event-descr>
+	      <audit-event-info type="optional">Packet size</audit-event-info>
+	    </audit-event>
+	  </f-component>
+
+	  <!-- 			-->
+	  <!-- FCS_SSHC_EXT.1	-->
+	  <!--			-->	
+	  <f-component cc-id="fcs_sshc_ext.1" name="SSH Protocol - Client" status="sel-based">
+	    <depends on="ssh-client"/>       
+	    <f-element id="fcs-sshc-ext-1e1">
+	      <title>The TSF shall authenticate its peer (SSH server) using: 
+	      <selectables linebreak="yes">
+		<selectable>using a local database by associating each host name with a public key corresponding to the following list:
+		<selectables linebreak="yes">
+		  <selectable>ssh-rsa (RFC 4253)</selectable> 
+		  <selectable>rsa-sha2-256 (RFC 8332)</selectable> 
+		  <selectable>rsa-sha2-512 (RFC 8332)</selectable>
+		  <selectable>ecdsa-sha2-nistp256 (RFC 5656)</selectable>
+		  <selectable>ecdsa-sha2-nistp384 (RFC 5656)</selectable>
+		  <selectable>ecdsa-sha2-nistp521 (RFC 5656)</selectable>
+		  <selectable>ssh-ed25519 (RFC 8709)</selectable>
+		  <selectable>ssh-ed448 (RFC 8709)</selectable>
+		</selectables>
+		</selectable>
+		<selectable>a list of trusted certification authorities when the public key is in the following formats:
+		<selectables linebreak="yes">
+		  <selectable>x509v3-ecdsa-sha2-nistp256 (RFC 6187)</selectable>  
+		  <selectable>x509v3-ecdsa-sha2-nistp384 (RFC 6187)</selectable>  
+		  <selectable>x509v3-ecdsa-sha2-nistp521 (RFC 6187)</selectable>  
+		  <selectable>x509v3-rsa2048-sha256  (RFC 6187)</selectable>
+		</selectables>
+		</selectable>
+	      </selectables>
+	      as described in RFC 4251 section 4.1.
+	      </title>
+
+
+	    </f-element>
+	    
+	  </f-component>
+
+	  <!-- 			-->
+	  <!-- FCS_SSHS_EXT.1	-->
+	  <!--			-->	
+	  <f-component cc-id="fcs_sshs_ext.1" name="SSH Protocol - Server" status="sel-based">
+	    <depends on="ssh-server"/>
+	    <f-element id="fcs-sshs-ext-1e1"> 
+	      <title>The TSF shall authenticate itself to its peer (SSH Client) using:
+	      <selectables linebreak="yes">
+		<selectable>ssh-rsa (RFC 4253)</selectable>
+		<selectable>rsa-sha2-256 (RFC 8332)</selectable>
+		<selectable>rsa-sha2-512 (RFC 8332)</selectable>
+		<selectable>ecdsa-sha2-nistp256 (RFC 5656)</selectable> 
+		<selectable>ecdsa-sha2-nistp384 (RFC 5656)</selectable>
+		<selectable>ecdsa-sha2-nistp521 (RFC 5656)</selectable> 
+		<selectable>x509v3-ecdsa-sha2-nistp256 (RFC 6187)</selectable> 
+		<selectable>x509v3-ecdsa-sha2-nistp384 (RFC 6187)</selectable> 
+		<selectable>x509v3-ecdsa-sha2-nistp521 (RFC 6187)</selectable>
+		<selectable>x509v3-rsa2048-sha256  (RFC 6187)</selectable>
+		<selectable>ssh-ed25519 (RFC 8709)</selectable>
+		<selectable>ssh-ed448 (RFC 8709)</selectable>
+		</selectables>.
+	      </title>
+
+
+	    </f-element>
+	  </f-component>    
+	</package>
+
+	<package>
+	  <git>
+	    <url>https://github.com/commoncriteria/tls</url>
+	    <branch>release-1.1</branch>
+	    <commit>53aaae9ea56c98e49b767ca19b2b6058206bab25</commit>
+	  </git>
+
+	  <f-component cc-id="fcs_tls_ext.1" name="TLS Protocol">
+	    <f-element id="f-type">
+	      <title>The product shall implement
+              <selectables linebreak="yes">
+		<selectable id="tlsc_impl">TLS as a client</selectable>
+		<selectable id="tlss_impl">TLS as a server</selectable>
+		<selectable id="dtlsc_impl">DTLS as a client</selectable>
+		<selectable id="dtlss_impl">DTLS as a server</selectable>
+		</selectables>.
+              </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_tlsc_ext.1" name="TLS Client Protocol" status="sel-based">
+	    <depends on="tlsc_impl"/>
+	    <f-element id="f-tlsc-version">
+              <title> The product shall implement TLS 1.2 (RFC 5246) and
+              <selectables>
+		</selectables> as a client that supports the cipher suites
+		<selectables linebreak="yes">
+		  <selectable>TLS_RSA_WITH_AES_128_CBC_SHA as defined in RFC 5246</selectable>
+		  <selectable>TLS_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		  <selectable>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		  <selectable id="tecdhe1">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe2">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe3">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe4">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe5">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe6">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe7">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		  <selectable id="tecdhe8">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		</selectables>
+		and also supports functionality for 
+		<selectables linebreak="yes">
+		  <selectable id="tlsc_mutual_auth">mutual authentication</selectable>
+		  <selectable id="tlsc_reneg">session renegotiation</selectable>
+		  </selectables>.
+              </title>
+	    </f-element>
+	    <f-element id="f-tlsc-presented-reference-ids">
+              <title> The product shall verify that the presented identifier matches the reference
+              identifier according to RFC 6125. </title>
+	    </f-element>
+
+	    <f-element id="f-tlsc-handle-bad-cert">
+              <title>The product shall not establish a trusted channel if the
+              server certificate is invalid
+              <selectables linebreak="yes">
+		<selectable exclusive="yes" id="s-tlsc-no-excep">with no exceptions</selectable>
+		</selectables>.
+	      </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_tlsc_ext.2" name="TLS Client Support for Mutual Authentication" status="sel-based">
+	    <depends on="tlsc_mutual_auth"/>
+	    <f-element id="f-tlsc-mutual-auth">
+              <title>The product shall support mutual authentication using X.509v3 certificates.</title>
+	    </f-element>
+	  </f-component>
+
+
+	  <f-component cc-id="fcs_tlsc_ext.3" name="TLS Client Support for Signature Algorithms Extension" status="objective">
+	    <f-element id="f-tlsc-sig-algo">
+              <title> The product shall present the signature_algorithms extension in the Client Hello with
+              the supported_signature_algorithms value containing the following hash algorithms: <selectables>
+              <selectable>SHA256</selectable>
+              <selectable>SHA384</selectable>
+              <selectable>SHA512</selectable>
+              </selectables> and no other hash algorithms. </title>
+	    </f-element>
+	  </f-component>
+
+	  <f-component cc-id="fcs_tlsc_ext.4" name="TLS Client Support for Renegotiation" status="sel-based">
+	    <depends on="tlsc_reneg"/>
+	    <f-element id="f-tlsc-reneg">
+              <title> The product shall support secure renegotiation through use
+              of the “renegotiation_info” TLS extension in accordance with RFC 5746. </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_tlsc_ext.5" name="TLS Client Support for Supported Groups Extension" status="sel-based">
+	    <depends on="tecdhe1" on1="tecdhe2" on2="tecdhe3" on3="tecdhe4" on4="tecdhe5" on5="tecdhe6" on6="tecdhe7" on7="tecdhe8"/>
+	    <depends on="decdhe1" on2="decdhe2" on3="decdhe3" on4="decdhe4" on5="decdhe5" on6="decdhe6" on7="decdhe7" on8="decdhe8"/>
+	    <f-element id="f-tlsc-groups-ext"><!-- Was 1.4 -->
+              <!-- TODO: IDs for ECC DHE curves -->
+              <title> The product shall present the Supported Groups Extension in the Client Hello
+              with the supported groups <selectables linebreak="yes">
+              <selectable>secp256r1</selectable>
+              <selectable>secp384r1</selectable>
+              <selectable>secp521r1</selectable>
+              <selectable>ffdhe2048(256)</selectable>
+              <selectable>ffdhe3072(257)</selectable>
+              <selectable>ffdhe4096(258)</selectable>
+              <selectable>ffdhe6144(259)</selectable>
+              <selectable>ffdhe8192(260)</selectable>
+              </selectables>.
+              </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_tlss_ext.1" name="TLS Server Protocol" status="sel-based">
+	    <depends on="tlss_impl"/>
+	    <f-element id="f-tlss-version">
+              <title> The product shall implement TLS 1.2 (RFC 5246) and
+              <selectables>
+		<selectable exclusive="yes">no earlier TLS versions</selectable>
+              </selectables>
+              as a server that supports the cipher suites
+              <selectables linebreak="yes">
+		<selectable>TLS_RSA_WITH_AES_128_CBC_SHA as defined in RFC 5246</selectable>
+		<selectable>TLS_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		<selectable>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		</selectables> and no other cipher suites,
+		and also supports functionality for
+		<selectables linebreak="yes">
+		  <selectable id="tlss_mutual_auth">mutual authentication</selectable>
+		  <selectable id="tlss_reneg">session renegotiation</selectable>
+		  </selectables>.
+              </title>
+	    </f-element>
+	    <f-element id="f-tlss-bad-version">
+              <title>The product shall deny connections from clients requesting
+              SSL 2.0, SSL 3.0, TLS 1.0 and
+              <selectables>
+		<selectable exclusive="yes">none</selectable>
+		</selectables>.
+              </title>
+	    </f-element>
+	    <f-element id="f-tlss-key-size">
+              <title>The product shall perform key establishment for TLS using
+              <selectables>
+		<selectable>RSA with size
+		<selectables>
+		  <selectable>2048 bits</selectable>
+		  <selectable>3072 bits</selectable>
+		  <selectable>4096 bits</selectable>
+		</selectables>
+		</selectable>
+		<selectable>Diffie-Hellman parameters with size
+		<selectables>
+		  <selectable>2048 bits</selectable>
+		  <selectable>3072 bits</selectable>
+		  <selectable>4096 bits</selectable>
+		</selectables>
+		</selectable>
+		<selectable>Diffie-Hellman groups
+		<selectables>
+		  <selectable>ffdhe2048</selectable>
+		  <selectable>ffdhe3072</selectable>
+		  <selectable>ffdhe4096</selectable>
+		  <selectable>ffdhe6144</selectable>
+		  <selectable>ffdhe8192</selectable>
+		  <selectable>no other groups</selectable>
+		</selectables>
+		</selectable>
+		</selectables>.
+              </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_tlss_ext.2" name="TLS Server Support for Mutual Authentication" status="sel-based">
+	    <depends on="tlss_mutual_auth"/>
+	    <f-element id="f-tlss-mutual-auth">
+              <title>The product shall support authentication of
+              TLS clients using X.509v3 certificates.
+              </title>
+	    </f-element>
+	    <f-element id="f-tlss-bad-cert">
+              <title>The product shall not establish a trusted channel
+              if the client certificate is invalid.
+              </title>
+	    </f-element>
+	    <f-element id="f-tlss-bad-dn-san">
+              <title>The product shall not establish a trusted channel if
+              the Distinguished Name (DN) or Subject Alternative Name (SAN)
+              contained in a certificate does not match one of the expected identifiers
+              for the client.
+              </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_tlss_ext.3" name="TLS Server Support for Signature Algorithms Extension" status="objective">
+	    <f-element id="f-tlss-hashalgos">
+              <title>The product shall present the HashAlgorithm
+              enumeration in supported_signature_algorithms in the
+              Certificate Request with the following hash algorithms:
+	      <selectables>
+		<selectable>SHA256</selectable>
+		<selectable>SHA384</selectable>
+		<selectable>SHA512</selectable>
+		</selectables> and no other hash algorithms.
+              </title>
+	    </f-element>
+	  </f-component>
+
+	  <f-component cc-id="fcs_tlss_ext.4" name="TLS Server Support for Renegotiation" status="sel-based">
+	    <depends on="tlss_reneg"/>
+	    <f-element id="f-tlss-support-reneg">
+              <title>The product shall support the "renegotiation_info" TLS extension
+              in accordance with RFC 5746.
+              </title>
+	    </f-element>
+	    <f-element id="f-tlss-include-reneg">
+              <title>The product shall include the renegotiation_info extension in
+              ServerHello messages.
+              </title>
+	    </f-element>
+	  </f-component>
+
+	  <f-component cc-id="fcs_dtlsc_ext.1" name="DTLS Client Protocol" status="sel-based">
+	    <depends on="dtlsc_impl"/>
+	    <f-element id="f-dtlsc-version">
+	      <title>The product shall implement DTLS 1.2 (RFC 6347) and
+	      <selectables>
+		<selectable>DTLS 1.0 (RFC 4347)</selectable>
+		</selectables> as a client that supports the cipher suites
+		<selectables linebreak="yes">
+		  <selectable>TLS_RSA_WITH_AES_128_CBC_SHA as defined in RFC 5246</selectable>
+		  <selectable>TLS_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		  <selectable>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		  <selectable>TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		  <selectable id="decdhe1">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe2">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe3">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe4">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe5">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe6">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe7">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		  <selectable id="decdhe8">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		</selectables>
+		and also supports functionality for 
+		<selectables linebreak="yes">
+		  <selectable id="dtlsc_mutual_auth">mutual authentication</selectable>
+		  </selectables>.
+	      </title>
+	    </f-element>
+
+	    <f-element id="f-dtlsc-pres-ids">
+	      <title> The product shall verify that the presented identifier matches the reference
+              identifier according to RFC 6125. </title>
+	    </f-element>
+
+	    <f-element id="f-dtlsc-bad-cert">
+	      <title>The product shall not establish a trusted channel if the
+              server certificate is invalid
+              <selectables>
+		<selectable>except when override is authorized</selectable>
+		</selectables>.
+	      </title>
+	    </f-element>
+	    <f-element id="f-dtlsc-bad-mac-decrypt">
+	      <title>The product shall
+	      <selectables>
+		<selectable>terminate the DTLS session</selectable>
+		<selectable>silently discard the record</selectable>
+	      </selectables>
+	      if a message received contains an invalid MAC or if decryption fails in the case of GCM and other
+	      AEAD ciphersuites.
+	      </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_dtlsc_ext.2" name="DTLS Client Support for Mutual Authentication" status="sel-based">
+	    <depends on="dtlsc_mutual_auth"/>
+	    <f-element id="f-dtlsc-mut-auth">
+              <title>
+		The product shall support mutual authentication using X.509v3 certificates.
+              </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_dtlss_ext.1" name="DTLS Server Protocol" status="sel-based">
+	    <depends on="dtlss_impl"/>
+	    <f-element id="f-dtlss-version">
+	      <title>The product shall implement DTLS 1.2 (RFC 6347) and
+	      <selectables>
+		<selectable>DTLS 1.0 (RFC 4347)</selectable>
+	      </selectables>
+              as a server that supports the ciphersuites
+              <selectables linebreak="yes">
+		<selectable>TLS_RSA_WITH_AES_128_CBC_SHA as defined in RFC 5246</selectable>
+		<selectable>TLS_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		<selectable>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 as defined in RFC 5246</selectable>
+		<selectable>TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5288</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 as defined in RFC 5289</selectable>
+		<selectable>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 as defined in RFC 5289</selectable>
+		</selectables> and no other cipher suites,
+		and also supports functionality for
+		<selectables linebreak="yes">
+		  <selectable exclusive="yes">none</selectable>
+		  </selectables>.
+	      </title>
+	    </f-element>
+
+	    <f-element id="f-dtlss-bad-versions">
+	      <title>The product shall deny connections from clients requesting
+              <assignable>list of DTLS protocol versions</assignable>.
+	      </title>
+	    </f-element>
+
+	    <f-element id="f-dtlss-bad-validation">
+	      <title>
+		The product shall not proceed with a connection handshake attempt if the DTLS Client fails validation.
+	      </title>
+	    </f-element>
+	    <f-element id="f-dtlss-key-size">
+	      <title>The product shall perform key establishment for DTLS using
+              <selectables>
+		<selectable>RSA with size
+		<selectables>
+		  <selectable>2048 bits</selectable>
+		  <selectable>3072 bits</selectable>
+		</selectables>
+		</selectable>
+		<selectable>Diffie-Hellman parameters with size
+		<selectables>
+		  <selectable>2048 bits</selectable>
+		  <selectable>3072 bits</selectable>
+		  <selectable>4096 bits</selectable>
+		  <selectable>6144 bits</selectable>
+		  <selectable>8192 bits</selectable>
+		</selectables>
+		</selectable>
+		<selectable>Diffie-Hellman groups
+		<selectables>
+		  <selectable>ffdhe2048</selectable>
+		  <selectable>ffdhe3072</selectable>
+		  <selectable>ffdhe4096</selectable>
+		  <selectable>ffdhe6144</selectable>
+		  <selectable>ffdhe8192</selectable>
+		  <selectable>no other groups</selectable>
+		</selectables>
+		</selectable>
+		<selectable>ECDHE parameters using elliptic curves
+		<selectables>
+		  <selectable>secp256r1</selectable>
+		  <selectable>secp384r1</selectable>
+		  <selectable>secp521r1</selectable>
+		</selectables> and no other curves</selectable>
+		</selectables>.
+	      </title>
+	    </f-element>
+	    <f-element id="f-dtlss-bad-mac-decrypt">
+	      <title>The product shall
+	      <selectables>
+		<selectable>terminate the DTLS session</selectable>
+		<selectable>silently discard the record</selectable>
+	      </selectables>
+	      if a message received contains an invalid MAC or if decryption fails in the case of GCM and other
+	      AEAD ciphersuites.
+	      </title>
+	    </f-element>
+	  </f-component>
+	  <f-component cc-id="fcs_dtlss_ext.2" name="DTLS Server Support for Mutual Authentication" status="sel-based">
+	    <depends on="dtlss_mutual_auth"/>
+	    <f-element id="f-dtlss-mut-auth">
+              <title>
+		The product shall support mutual authentication of DTLS clients using X.509v3 certificates.
+              </title>
+	    </f-element>
+	    <f-element id="f-dtlss-handle-bad-cert">
+	      <title>The product shall not establish a trusted channel
+              if the client certificate is invalid.
+	      </title>
+	    </f-element>
+	    <f-element id="f-dtlss-handle-bad-dn-san">
+	      <title>The product shall not establish a trusted channel if
+              the Distinguished Name (DN) or Subject Alternative Name (SAN)
+              contained in a certificate does not match one of the expected identifiers
+              for the client.
+	      </title>
+	    </f-element>
+    </f-component>
+  </package>
+
+  <base-pp>
+    <git>
+      <url>https://github.com/commoncriteria/operatingsystem</url>
+      <branch>release-4.3</branch>
+      <commit>3566d59e9044a973a9c0a039d014f162fe63e21c</commit>
+    </git>
+    <f-component cc-id="fcs_ckm.1" name="Cryptographic Key Generation (Refined)">
+      <f-element id="fel-asym-gen">
+	<title> The <h:b>OS</h:b> shall generate <h:b>asymmetric</h:b> cryptographic keys in accordance with a
+	specified cryptographic key generation algorithm <selectables linebreak="yes">
+	<selectable id="s-keygen-rsa"><snip>RSA schemes</snip> using cryptographic key sizes of 3072-bit or greater that
+	meet the following: FIPS PUB 186-4, "Digital Signature Standard (DSS)", Appendix B.3
+	</selectable>
+	<selectable id="s-keygen-ecc"><snip>ECC schemes using "NIST curves"</snip> P-384 and
+	<selectables>
+          <selectable>P-521</selectable>
+          </selectables> that meet the following: FIPS PUB 186-4, "Digital Signature Standard (DSS)",
+          Appendix B.4
+	</selectable>
+	<selectable id="s-keygen-ffc">
+	  <snip>FFC schemes</snip> using 
+	  <selectables>
+	    <selectable id="s-keygen-ffc-fips">cryptographic key sizes of 3072-bit
+            or greater that meet the following: <snip>FIPS PUB 186-4</snip>, "Digital Signature
+            Standard (DSS)", Appendix B.1</selectable>
+	    <!-- <selectable id="s-keygen-ffc-dh"><snip>Diffie-Hellman Group 14</snip> that meet the following: RFC 3526 </selectable> -->
+	    <selectable id="s-keygen-ffc-safeprime"><snip>safe primes</snip> that meet the following: 
+	    NIST Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key Establishment Schemes"
+	  </selectable>
+	</selectables>
+      </selectable>
+      </selectables>.
+    </title>
+  </f-element>
+</f-component>
+
+<f-component cc-id="ftp_itc_ext.1" name="Trusted channel communication">
+  <f-element id="fel-trust-comms">
+    <title>
+      The OS shall use
+      <selectables linebreak='yes'>
+        <selectable id="tls">
+	  <snip>TLS</snip> as conforming to the <xref to="pkg-tls"/> as a
+    	  <selectables><selectable id="s-tls-client"><readable>client(TLS)</readable>client</selectable><selectable id="s-tls-server"><readable>server(TLS)</readable>server</selectable></selectables>
+	</selectable>
+        <selectable id="dtls"><snip>DTLS</snip> as conforming to the <xref to="pkg-tls"/> as a
+    	<selectables><selectable id="s-dtls-client"><readable>client(DTLS)</readable>client</selectable><selectable id="s-dtls-server"><readable>server(DTLS)</readable>server</selectable></selectables>
+      </selectable>
+
+    </selectables>
+    to provide a trusted communication channel between itself and
+    authorized IT entities supporting the following capabilities:
+    <selectables>
+      <selectable>audit server</selectable>
+      <selectable>authentication server</selectable>
+      <selectable>management server</selectable>
+      <selectable><assignable>other capabilities</assignable></selectable>
+    </selectables>
+    that is logically distinct from other communication
+    channels and provides assured identification of its end points and protection of the channel
+    data from disclosure and detection of modification of the channel data.
+  </title>
+</f-element>
+</f-component>
+
+<f-component cc-id="fcs_ckm.2" name="Cryptographic Key Establishment (Refined)">
+  <f-element id="fel-crypt-key-estab">
+    <title>The OS shall <h:b>implement functionality to perform cryptographic key establishment</h:b>
+    in accordance with a specified cryptographic key <h:b>establishment</h:b> method:
+    <selectables linebreak="yes">
+      <selectable id="s-keyestab-rsa"><snip>RSA-based</snip> key establishment schemes that meets the following:
+      RSAES-PKCS1-v1_5 as specified in Section 7.2 of RFC 8017, “Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.2"</selectable>
+      
+      <selectable id="s-keyestab-ecc"><snip>Elliptic curve-based</snip> key establishment schemes that meets the following: NIST Special Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key Establishment Schemes Using Discrete Logarithm Cryptography”</selectable>
+      <selectable id="s-keyestab-ffc"><snip>Finite field-based</snip> key establishment schemes
+      that meets <snip>NIST Special Publication 800-56A</snip> Revision 3, “Recommendation for Pair-Wise Key Establishment Schemes Using Discrete Logarithm Cryptography”</selectable>
+      <!-- <selectable id="s-keyestab-dh">using <snip>Diffie-Hellman</snip> group 14 that meets the following: RFC 3526</selectable> -->
+      </selectables>.
+    </title>
+    
+
+    <rule id="r-key-rsa">
+      <if><ref-id>s-keyestab-rsa</ref-id></if>
+      <then><ref-id>s-keygen-rsa</ref-id></then>
+    </rule>
+    <rule id="r-key-ecc">
+      <if><ref-id>s-keyestab-ecc</ref-id></if>
+      <then><ref-id>s-keygen-ecc</ref-id></then>
+    </rule>
+    <rule id="r-key-ffc">
+      <if><ref-id>s-keyestab-ffc</ref-id></if>
+      <then><ref-id>s-keygen-ffc</ref-id></then>
+    </rule>
+    
+  </f-element>
+</f-component>
+
+<ext-comp-def fam-id="FCS_CKM_EXT" title="Cryptographic Key Handling">
+  <fam-behavior>This family defines requirements for handling cryptographic keys.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fcs_ckm_ext.4" name="Cryptographic Key Destruction" >
+  <f-element id="fel-key-kill">
+    <title>
+      The OS shall destroy cryptographic keys and key material in accordance with a specified cryptographic key destruction method
+      <selectables>
+	<selectable>For volatile memory, the destruction shall be executed by a
+	<selectables>
+	  <selectable>single overwrite consisting of <selectables>
+<selectable>a pseudo-random pattern using the TSF&apos;s RBG</selectable>
+<selectable>zeroes</selectable>
+<selectable>ones</selectable>
+<selectable>a new value of a key</selectable>
+<selectable><assignable> any value that does not contain any CSP</assignable></selectable></selectables></selectable>
+<selectable>removal of power to the memory</selectable>
+<selectable>destruction of reference to the key directly followed by a request for garbage collection</selectable>
+</selectables></selectable>
+<selectable>For non-volatile memory that consists of 
+<selectables>
+  <selectable id="s-kek-kill"><snip>destruction
+  of all key encrypting keys (KEKs) protecting the target key
+  according to <xref to="fel-key-kill"/></snip>, where none of the KEKs protecting the target key are derived
+</selectable>
+<selectable>the invocation of an interface provided by the underlying platform that
+<selectables>
+  <selectable>logically addresses the storage location of the key and performs a 
+  <selectables>
+<selectable>single</selectable>
+<selectable><assignable>ST author defined multi-pass</assignable></selectable>
+</selectables>overwrite consisting of
+<selectables>
+<selectable>zeroes</selectable><selectable>ones</selectable>
+<selectable>pseudo-random pattern</selectable>
+<selectable>a new value of a key of the same size</selectable>
+<selectable><assignable>any value that does not contain any CSP</assignable></selectable></selectables></selectable>
+<selectable>instructs the underlying platform to destroy the abstraction that represents the key</selectable>
+</selectables>
+</selectable>
+</selectables>
+</selectable>
+</selectables>
+.
+</title>
+
+</f-element>
+<f-element id="fel-key-kill-when">
+<title>The OS shall destroy all keys and key material when no longer needed.</title>
+
+
+</f-element>
+</f-component>
+
+<f-component cc-id="fcs_cop.1" iteration="ENCRYPT" name="Cryptographic Operation - Encryption/Decryption (Refined)">
+  <f-element id="fel-encrypt-how">
+    <title>
+      The <h:b>OS</h:b> shall perform [<h:i>encryption/decryption services for data</h:i>] in
+      accordance with a specified cryptographic algorithm<h:b>
+      <selectables linebreak="yes">
+<selectable id="s-aes-xts"><snip>AES-XTS</snip> (as defined in NIST SP 800-38E)</selectable>
+<selectable id="s-aes-cbc"><snip>AES-CBC</snip> (as defined in NIST SP 800-38A)</selectable>
+<selectable id="s-aes-ctr"><snip>AES-CTR</snip> (as defined in NIST SP 800-38A)</selectable>
+</selectables>
+and
+<selectables linebreak="yes">
+  <!-- <selectable>AES-CCMP (as defined in FIPS PUB 197, NIST SP 800-38C and IEEE 802.11-2012)</selectable> -->
+<selectable id="s-aes-kw">AES Key Wrap (KW) (as defined in NIST SP 800-38F)</selectable>
+<selectable id="s-aes-kwp">AES Key Wrap with Padding (KWP) (as defined in NIST SP 800-38F)</selectable>
+<!-- <selectable>AES-GCM (as defined in NIST SP 800-38D)</selectable> -->
+<!-- <selectable>AES-CCM (as defined in NIST SP 800-38C)</selectable> -->
+<selectable id="s-aes-ccmp"><snip>AES-CCMP-256</snip> (as defined in NIST SP 800-38C and IEEE 802.11ac-2013)</selectable>
+<selectable id="s-aes-gcmp"><snip>AES-GCMP-256</snip> (as defined in NIST SP 800-38D and IEEE 802.11ac-2013)</selectable>
+
+<!-- <depends on="s-ftp_ssh"/> Could have added this to the previous, but choose to use rules.-->
+
+</selectables></h:b>
+and cryptographic key sizes 256-bit.
+<!-- <selectables> -->
+<!--   <selectable>128-bit</selectable> -->
+<!--   <selectable>256-bit</selectable> -->
+<!-- </selectables> -->
+<h:strike>that meet the following: [assignment: list of standards]</h:strike>.
+</title>
+
+
+<rule id="r-wlan-aes">
+  <or>
+<and><not><ref-id>mod-wlanclient</ref-id></not></and>
+<and>
+<ref-id>mod-wlanclient</ref-id>
+<or><ref-id>s-aes-ccmp</ref-id><ref-id>s-aes-gcmp</ref-id></or>
+</and>
+</or>
+</rule>
+<!-- <rule id="r-aes-ctr-for-ssh"> -->
+<!--   <if><ref-id>s-ftp_ssh</ref-id></if> -->
+<!--   <then><ref-id>s-aes-ctr</ref-id></then> -->
+<!-- <or><and><ref-id>s-aes-ctr</ref-id><ref-id>s-ftp_ssh</ref-id></and> -->
+<!-- <not><ref-id>s-ftp_ssh</ref-id></not> -->
+<!-- </or> -->
+<!-- </rule> -->
+</f-element>
+</f-component>
+<f-component cc-id="fcs_cop.1" iteration="HASH" name="Cryptographic Operation - Hashing (Refined)">
+  <f-element id="fel-hash-how">
+    <title>The <h:b>OS</h:b> shall perform [<h:i>cryptographic hashing services</h:i>] in accordance with a
+    specified cryptographic algorithm <h:b>
+    <selectables linebreak="yes">
+<selectable>SHA-256</selectable>
+<selectable>SHA-384</selectable>
+<selectable>SHA-512</selectable>
+</selectables>
+and message digest sizes
+<selectables linebreak="yes">
+<selectable>160 bits</selectable>
+<selectable>256 bits</selectable>
+<selectable>384 bits</selectable>
+<selectable>512 bits</selectable>
+</selectables></h:b> that meet the following: [<h:i>FIPS Pub 180-4</h:i>]. </title>
+
+
+</f-element>
+</f-component>
+<f-component cc-id="fcs_cop.1" iteration="SIGN" name="Cryptographic Operation - Signing (Refined)">
+  <f-element id="fel-sign-how">
+    <title>The <h:b>OS</h:b> shall perform [<h:i>cryptographic signature services (generation and
+    verification)</h:i>] in accordance with a specified cryptographic algorithm <h:b><selectables
+    linebreak="yes">
+    <selectable id="s-rsa-certs">RSA schemes using cryptographic key sizes of 2048-bit or greater
+that meet the following: FIPS PUB 186-4, "Digital Signature Standard (DSS)",  Section 4</selectable>
+<selectable id="s-ec-certs"><snip>ECDSA schemes</snip> using "NIST curves" P-384 and <selectables>
+<selectable>P-521</selectable>
+</selectables>
+that meet the following: FIPS PUB 186-4, "Digital Signature   Standard (DSS)", Section 5</selectable>
+</selectables></h:b>
+<h:strike>and cryptographic key sizes [assignment: cryptographic algorithm]
+that meet the following: [assignment: list of standards]</h:strike>.
+</title>
+
+
+</f-element>
+</f-component>
+<f-component cc-id="fcs_cop.1" iteration="KEYHMAC" name="Cryptographic Operation - Keyed-Hash Message Authentication (Refined)">
+  <f-element id="fel-keyed-hash-how">
+    <title>The <h:b>OS</h:b> shall perform [<h:i>keyed-hash message authentication services</h:i>]
+    in accordance with a specified cryptographic algorithm<h:b>
+    <selectables>
+<selectable>SHA-256</selectable>
+<selectable>SHA-384</selectable>
+<selectable>SHA-512</selectable>
+</selectables>
+with key sizes <assignable>key size (in bits) used in HMAC</assignable>
+and message digest</h:b> sizes
+<selectables>
+  <selectable>160 bits</selectable>
+<selectable>256 bits</selectable>
+<selectable>384 bits</selectable>
+<selectable>512 bits</selectable>
+</selectables> that meet the following: [<h:i>FIPS Pub 198-1 The Keyed-Hash Message
+Authentication Code and FIPS Pub 180-4 Secure Hash Standard</h:i>]. </title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FCS_RBG_EXT" title="Random Bit Generation Services">
+<fam-behavior>This family defines requirements for generating random bits</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fcs_rbg_ext.1" name="Random Bit Generation">
+  <f-element id="fel-rbg-how">
+    <title>
+      The OS shall perform all deterministic random bit generation (DRBG) services in
+      accordance with NIST Special Publication 800-90A using
+      <selectables linebreak="yes">
+<selectable>Hash_DRBG (any)</selectable>
+<selectable>HMAC_DRBG (any)</selectable>
+<selectable>CTR_DRBG (AES)</selectable>
+</selectables>
+.
+</title>
+
+
+</f-element>
+
+<f-element id="fel-rbg-seed-how">
+  <title>
+    The deterministic RBG used by the OS shall be seeded by an entropy source that
+    accumulates entropy from a
+    <selectables linebreak="yes">
+<selectable>software-based noise source</selectable>
+<selectable>platform-based noise source</selectable>
+</selectables>
+with a minimum of 256 bits
+<!-- <selectables linebreak="yes"> -->
+<!--   <selectable>128 bits</selectable> -->
+<!--   <selectable>256 bits</selectable> -->
+<!-- </selectables> -->
+of entropy at least equal to the greatest security strength (according to NIST SP 800-57)
+of the keys and hashes that it will generate.
+</title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FCS_STO_EXT" title="Storage of Special Data">
+<fam-behavior>This family defines requirements concerning the storage of certain types of data.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fcs_sto_ext.1" name="Storage of Sensitive Data">
+  <f-element id="fel-store-sdata">
+    <title>
+      The OS shall implement functionality to encrypt sensitive data
+      stored in non-volatile storage and provide interfaces to applications to invoke this functionality.
+    </title>
+    
+
+  </f-element>
+</f-component>
+
+<section title="User Data Protection (FDP)" id="fdp">
+  <ext-comp-def title="Access Controls for User Data" fam-id="FDP_ACF_EXT">
+<fam-behavior>This family defines requirements for controlling access to user data.</fam-behavior>
+</ext-comp-def>
+<f-component cc-id="fdp_acf_ext.1" name="Access Controls for Protecting User Data">
+  <f-element id="fel-protect-user-data">
+    <title>
+      The OS shall implement access controls which can prohibit unprivileged users from
+      accessing files and directories owned by other users.
+</title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FDP_IFC_EXT" title="Information flow control">
+  <fam-behavior>This family of requirements defines how flows of information are controlled.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fdp_ifc_ext.1" name="Information flow control" status="sel-based">
+  <depends on="s-itc-ipsec"/>
+<depends><optional/></depends>
+<f-element id="fel-dit-vpn">
+  <title> The OS shall
+  <selectables linebreak="yes">
+<selectable>provide an interface which allows a VPN client to protect all IP traffic using IPsec</selectable>
+<selectable id="s-provides-vpnclient"><snip>provide a VPN client</snip> that can protect all IP traffic using IPsec</selectable>
+</selectables>
+with the exception of IP traffic required to establish the VPN connection
+and
+<selectables>
+<selectable>signed updates directly from the OS vendor</selectable>
+</selectables>
+.
+</title>
+
+
+</f-element>
+</f-component>
+</section>
+<section title="Security Management (FMT)" id="fmt">
+  <ext-comp-def fam-id="FMT_MOF_EXT" title="Management of security functions behavior">
+<fam-behavior>This family of requirements define the behavior of security function management.</fam-behavior>
+</ext-comp-def>
+<f-component cc-id="fmt_mof_ext.1" name="Management of security functions behavior">
+  <f-element id="fel-man-sec-func">
+    <title>
+      The OS shall restrict the ability to perform the function indicated in the "Administrator" column in 
+      <xref to="fel-manage-functions"/> to the administrator.
+</title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FMT_SMF_EXT" title="Specification of Management Functions">
+<fam-behavior>This family of requirements defines the management of security functions. </fam-behavior>
+</ext-comp-def>
+<f-component cc-id="fmt_smf_ext.1" name="Specification of Management Functions">
+  <f-element id="fel-manage-functions">
+    <title>
+      The OS shall be capable of performing the following management functions:
+      <h:br/>
+      <management-function-set default="O">
+	<manager cid="a">Administrator</manager>
+<manager cid="u">User</manager>
+<management-function><text>Enable/disable <selectables><selectable>screen lock</selectable><selectable>session timeout</selectable></selectables></text><M ref="a"/></management-function>
+<management-function><text>Configure <selectables><selectable>screen lock</selectable><selectable>session</selectable></selectables> inactivity timeout</text><M ref="a"/></management-function>
+<management-function><text>import keys/secrets into  the secure key storage</text></management-function>
+<management-function><text>Configure local audit storage capacity</text></management-function>
+<management-function><text>Configure minimum password length</text></management-function>
+<management-function><text>Configure minimum number of special characters in password</text></management-function>
+<management-function><text>Configure minimum number of numeric characters in password</text></management-function>
+<management-function><text>Configure minimum number of uppercase characters in password</text></management-function>
+<management-function><text>Configure minimum number of lowercase characters in password</text></management-function>
+<management-function><text>
+  Configure lockout policy for unsuccessful authentication attempts through
+  <selectables>
+<selectable>timeouts between attempts</selectable>
+<selectable>limiting number of attempts during a time period</selectable>
+</selectables>
+</text></management-function>
+<management-function><text>Configure host-based firewall</text></management-function>
+<management-function><text>Configure name/address of directory server with which to bind</text></management-function>
+<management-function><text>Configure name/address of remote management server from which to receive management settings</text></management-function>
+<management-function><text>Configure name/address of audit/logging server to which to send audit/logging records</text></management-function>
+<management-function><text>Configure audit rules</text></management-function>
+<management-function><text>Configure name/address of network time server</text></management-function>
+<management-function><text>Enable/disable automatic software update</text></management-function>
+<management-function><text>Configure Wi-Fi interface</text></management-function>
+<management-function><text>Enable/disable Bluetooth interface</text></management-function>
+<management-function><text>Enable/disable <assignable> list of other external interfaces</assignable></text></management-function>
+<management-function><text><assignable>list of other management functions to be provided by the TSF</assignable></text></management-function>
+</management-function-set>
+.
+</title>
+
+
+</f-element>
+</f-component>
+</section>
+<section title="Protection of the TSF (FPT)" id="fpt">
+
+  <ext-comp-def fam-id="FPT_ACF_EXT" title="Access controls">
+    <fam-behavior>This family of requirements defines the access controls to system resources. </fam-behavior>
+  </ext-comp-def>
+  
+  <f-component cc-id="fpt_acf_ext.1" name="Access controls">
+    <f-element id="fel-protect-priv">
+      <title> The OS shall implement access controls which prohibit unprivileged users from
+      modifying: <h:ul>
+      <h:li>Kernel and its drivers/modules</h:li>
+      <h:li>Security audit logs</h:li>
+      <h:li>Shared libraries</h:li>
+      <h:li>System executables</h:li>
+<h:li>System configuration files</h:li>
+<h:li><assignable>other objects</assignable></h:li>
+</h:ul>
+.
+</title>
+
+</f-element>
+<f-element id="fel-no-read">
+  <title> The OS shall implement access controls which prohibit unprivileged users from
+  reading: <h:ul>
+  <h:li>Security audit logs</h:li>
+  <h:li>System-wide credential repositories</h:li>
+  <h:li><assignable>list of other objects</assignable></h:li>
+</h:ul>
+.
+</title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FPT_ASLR_EXT" title="Address Space Layout Randomization">
+  <fam-behavior>This family of requirements defines the behavior of ASLR.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fpt_aslr_ext.1" name="Address Space Layout Randomization">
+  <f-element id="fel-aslr">
+    <title>The OS shall always randomize process address space memory locations with
+    <selectables>
+<selectable>8</selectable>
+<selectable><assignable>number greater than 8</assignable></selectable>
+</selectables>
+bits of entropy except for
+<assignable>list of explicit exceptions</assignable>.
+</title>
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FPT_BLT_EXT" title="Limitation of Bluetooth Profile Support">
+<fam-behavior>This family defines requirements for limiting Bluetooth capabilities without user action.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fpt_blt_ext.1" name="Limitation of Bluetooth Profile Support" status="objective">
+<comp-lev> requires the TSF to maintain a disabled by default posture for Bluetooth profiles.</comp-lev>
+<management>There are no management activities foreseen.</management>
+<audit>There are no auditable events foreseen.</audit>
+<dependencies>No dependencies.</dependencies>
+
+
+<f-element id="fel-bluetooth-stop">
+  <title>
+    The TSF shall disable support for
+<assignable>list of Bluetooth profiles</assignable>
+Bluetooth profiles when they are not currently being used by
+an application on the TOE and shall require explicit user action to enable
+them.
+</title>
+
+
+</f-element>
+</f-component>
+
+
+<ext-comp-def fam-id="FPT_SBOP_EXT" title="Stack Buffer Overflow Protection">
+<fam-behavior>This family of requirements defines the protections for the stack.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fpt_sbop_ext.1" name="Stack Buffer Overflow Protection">
+  <f-element id="fel-sbop">
+    <title>
+      The OS shall <selectables>
+<selectable>employ stack-based buffer overflow protections</selectable>
+<selectable>not store parameters/variables in the same data structures as control flow values</selectable>
+</selectables>.
+</title>
+
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FPT_SRP_EXT" title="Software Restriction Policies">
+<fam-behavior>This family of requirements defines how access to executes is restricted.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fpt_srp_ext.1" name="Software Restriction Policies" status="objective">
+  <f-element id="fel-srp">
+    <title> The OS shall restrict execution to only programs which match an administrator-specified
+    <selectables linebreak="yes">
+<selectable id="s-srp-path">file path</selectable>
+<selectable id="s-srp-signature">file digital signature</selectable>
+<selectable id="s-srp-version">version</selectable>
+<selectable id="s-srp-hash">hash</selectable>
+<selectable id="s-srp-other"><readable>other</readable><assignable>other characteristics</assignable></selectable>
+</selectables>
+.
+</title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FPT_TST_EXT" title="Integrity Tests">
+<fam-behavior>This family of requirements defines how the TOE validates the integrity of critical components. </fam-behavior>
+</ext-comp-def>
+<f-component cc-id="fpt_tst_ext.1" name="Boot Integrity">
+  <f-element id="fel-boot">
+    <title>The OS shall verify the integrity of the bootchain up through the OS kernel and
+    <selectables linebreak="yes">
+<selectable id="s-verify-all-code">all executable code stored in mutable media</selectable>
+<selectable><assignable>list of other executable code</assignable></selectable>
+</selectables>
+prior to its execution through the use of
+<selectables linebreak="yes">
+<selectable>a digital signature using a hardware-protected asymmetric key</selectable>
+<selectable id="s-boot-x509">a digital signature using an X509 certificate with hardware-based protection</selectable>
+<selectable>a hardware-protected hash</selectable>
+</selectables>
+.
+</title>
+
+
+</f-element>
+</f-component>
+
+<ext-comp-def fam-id="FPT_TUD_EXT" title="Trusted Update">
+<fam-behavior>This family of requirements defines how the TOE validates software updates.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fpt_tud_ext.1" name="Trusted Update">
+  <f-element id="fel-os-update">
+    <title>The OS shall provide the ability to check for updates to the OS
+software itself and shall use a digital signature scheme specified in FCS_COP.1/SIGN to validate the authenticity of the response. </title>
+
+
+</f-element>
+<f-element id="fel-verify-updates">
+  <title>
+    The OS shall 
+    <selectables>
+<selectable>cryptographically verify</selectable>
+<selectable>invoke platform-provided functionality to cryptographically verify</selectable>
+</selectables>
+updates to itself using a digital
+signature prior to installation using schemes specified in FCS_COP.1/SIGN.
+</title>
+
+
+</f-element>
+</f-component>
+<f-component cc-id="fpt_tud_ext.2" name="Trusted Update for Application Software">
+  <!-- TO DO: Cite references. -->
+  <f-element id="fel-app-check-update">
+    <title>
+      The OS shall provide the ability to check for updates to
+      application software and shall use a digital signature scheme specified in 
+      FCS_COP.1/SIGN to validate the authenticity of the response.
+    </title>
+    
+
+  </f-element>
+  <f-element id="fel-verify-app-updates">
+    <title>
+      The OS shall cryptographically verify the integrity of updates
+      to applications using a digital signature specified by
+      FCS_COP.1/SIGN prior to installation.
+</title>
+
+</f-element>
+</f-component>
+
+
+<ext-comp-def fam-id="FPT_W^X_EXT" title="Write XOR Execute">
+  <fam-behavior>
+    This family of requirements defines how the TOE ensures that it executes only those items that are non-writable with specified exceptions.
+  </fam-behavior>
+</ext-comp-def>
+<f-component cc-id="fpt_w^x_ext.1" name="Write XOR Execute Memory Pages">
+  <f-element id="fel-no-rw-mem">
+    <title> The OS shall prevent allocation of any memory region with both write and
+    execute permissions except for <assignable>list of exceptions</assignable>.
+</title>
+
+
+</f-element>
+</f-component>
+</section>
+<section title="Audit Data Generation (FAU)" id="fau">
+  <f-component cc-id="fau_gen.1" name="Audit Data Generation (Refined)">
+    <f-element id="fel-faugen">
+      <title>
+	The <h:b>OS</h:b> shall be able to generate an audit record of the following auditable
+        events:
+        <h:ol type='a'>
+<h:li>Start-up and shut-down of the audit functions;</h:li>
+<h:li>All auditable events for the [<h:i>not specified</h:i>] level of audit; and [</h:li>
+<h:li><h:i>
+  <h:ul><h:li>Authentication events (Success/Failure);</h:li>
+  <h:li>Use of privileged/special rights events (Successful and unsuccessful security, audit, and configuration changes);</h:li>
+<h:li>Privilege or role escalation events (Success/Failure);</h:li>
+<h:li><selectables linebreak='yes'>
+<selectable>File and object events (Successful and unsuccessful attempts to create, access, delete, modify, modify permissions)</selectable>
+<selectable>User and Group management events (Successful and unsuccessful add, delete, modify, disable, enable, and credential change)</selectable>
+<selectable>Audit and log data access events (Success/Failure)</selectable>
+<selectable>Cryptographic verification of software (Success/Failure)</selectable>
+<selectable>Attempted application invocation with arguments (Success/Failure e.g. due to software restriction policy)</selectable>
+<selectable>System reboot, restart, and shutdown events (Success/Failure)</selectable>
+<selectable>Kernel module loading and unloading events (Success/Failure)</selectable>
+<selectable>Administrator or root-level access events (Success/Failure)</selectable>
+<selectable><assignable>other specifically defined auditable events</assignable>.</selectable>
+</selectables>
+</h:li>
+</h:ul>
+</h:i>].
+</h:li>
+</h:ol>
+</title>
+
+</f-element>
+<f-element id="fel-audit-content">
+  <title> The <h:b>OS</h:b> shall record within each audit record at least the following information:
+  <h:ol type='a'>
+    <h:li>Date and time of the event, type of event, subject identity (if applicable),
+    and outcome (success or failure) of the event; and </h:li>
+    <h:li>For each audit event type, based on the auditable event
+    definitions of the functional components included in the PP/ST,
+<assignable>other audit relevant information</assignable>
+</h:li>
+</h:ol>
+.
+</title>
+
+
+</f-element>
+</f-component>
+</section>
+<section title="Identification and Authentication (FIA)" id="fia">
+  <f-component cc-id="fia_afl.1" name="Authentication failure handling (Refined)">
+    <f-element id="fel-id-and-auth">
+      <title>
+        The <h:b>OS</h:b> shall detect when
+        <selectables linebreak='yes'>
+<selectable><assignable>positive integer number</assignable></selectable>
+<selectable>an administrator configurable positive integer within <assignable>range of acceptable values</assignable></selectable>
+</selectables>
+unsuccessful authentication attempts occur related to
+<h:b>
+  events with
+  <selectables linebreak="yes">
+<selectable>authentication based on user name and password</selectable>
+<selectable>authentication based on user name and a PIN that
+releases an asymmetric key stored in OE-protected storage</selectable>
+<selectable>authentication based on X.509 certificates</selectable>
+</selectables>
+</h:b>.
+</title>
+
+</f-element>
+<f-element id="fel-bad-attempts">
+  <title>
+    When the defined number of unsuccessful authentication attempts for an
+    account has been <h:b>met</h:b>, the <h:b>OS</h:b> shall:
+    <h:b>
+      <selectables>
+<selectable>Account Lockout</selectable>
+<selectable>Account Disablement</selectable>
+<selectable>Mandatory Credential Reset</selectable>
+<selectable><assignable>list of actions</assignable></selectable>
+</selectables>
+</h:b>.
+</title>
+
+
+</f-element>
+</f-component>
+<f-component cc-id="fia_uau.5" name="Multiple Authentication Mechanisms (Refined)">
+  <f-element id="fel-mult-auth">
+    <title>
+      The <refinement>OS</refinement> shall provide the following authentication mechanisms
+      <h:b><selectables linebreak='yes'>
+	<selectable id="s-pass">authentication based on username and password</selectable>
+	<selectable id="s-pin">authentication based on <snip>username and a PIN that releases an asymmetric key</snip> stored
+in OE-protected storage</selectable>
+<selectable id="s-otp">combination of authentication based on user name, password, and time-based one-time password</selectable>
+<selectable id="s-x509-auth">authentication based on X.509 certificates</selectable>
+<selectable id="s-uau-ssh">for use in SSH only, <snip>SSH public key-based authentication</snip> as specified by the <xref to="pkg-ssh"/></selectable>
+</selectables>
+</h:b>
+to support user authentication.
+</title>
+
+
+</f-element>
+<f-element id="fel-auth-how">
+  <title>
+    The <h:b>OS</h:b> shall authenticate any user's claimed identity according to the
+    <assignable>
+      rules describing how the multiple authentication
+      mechanisms provide authentication
+      </assignable>.
+</title>
+
+
+</f-element>
+</f-component>
+
+
+<ext-comp-def fam-id="FIA_X509_EXT" title="X.509 Certificate Validation">
+<fam-behavior>This family of requirements defines how the X.509 performs validation and what they should be used for.</fam-behavior>
+</ext-comp-def>
+
+<f-component cc-id="fia_x509_ext.1" id="fc-cert-val" name="X.509 Certificate Validation">
+  <f-element id="fel-cert-val">
+    <title>
+      The OS shall implement functionality to validate certificates in accordance with the following rules:
+      <h:ul>
+<h:li>RFC 5280 certificate validation and certificate path validation</h:li>
+<h:li>The certificate path must terminate with a trusted CA certificate</h:li>
+<h:li>The OS shall validate a certificate path by ensuring the presence of the 
+basicConstraints extension, that the CA flag is set to TRUE for all CA certificates,
+and that any path constraints are met.</h:li>
+<h:li>The TSF shall validate that any CA certificate includes "Certificate Signing" as a  purpose the key usage field</h:li>
+
+<h:li>The OS shall validate the revocation status of the certificate using 
+<selectables>
+<selectable>OCSP as specified in RFC 6960</selectable>
+<selectable>CRL as specified in RFC 8603</selectable>
+<selectable>an OCSP TLS Status Request Extension (OCSP stapling) as specified
+in RFC 6066</selectable>
+<selectable> OCSP TLS Multi-Certificate Status Request Extension 
+(i.e., OCSP Multi-Stapling) as specified in RFC 6961</selectable>
+</selectables>
+with
+<selectables><selectable>no exceptions</selectable>
+<selectable id="s-revoc-exceptions"><readable>exceptional use cases</readable><assignable>exceptional use cases and alternative status check</assignable></selectable></selectables></h:li>
+
+<h:li>The OS shall validate the extendedKeyUsage field according to the following rules:
+<h:ul>
+
+<h:li> Certificates used for trusted updates and executable code integrity verification shall have the Code Signing Purpose (id-kp 3 with OID 1.3.6.1.5.5.7.3.3) in the extendedKeyUsage field.</h:li>
+<h:li>Server certificates presented for TLS shall have the Server Authentication purpose (id-kp 1 with OID 1.3.6.1.5.5.7.3.1) in the extendedKeyUsage field.</h:li>	
+<h:li>Client certificates presented for TLS shall have the Client Authentication purpose (id-kp 2 with OID 1.3.6.1.5.5.7.3.2) in the EKU field.</h:li>
+<h:li>S/MIME certificates presented for email encryption and signature shall have the Email Protection purpose (id-kp 4 with OID 1.3.6.1.5.5.7.3.4) in the EKU field.</h:li>
+<h:li>OCSP certificates presented for OCSP responses shall have the OCSP Signing Purpose (id-kp 9 with OID 1.3.6.1.5.5.7.3.9) in the EKU field.</h:li>
+<h:li>Server certificates presented for EST shall have the CMC Registration Authority (RA) purpose (id-kp-cmcRA with OID 1.3.6.1.5.5.7.3.28) in the EKU field. (conditional)</h:li>
+</h:ul>
+</h:li>
+</h:ul>				
+.
+</title>
+
+
+</f-element>
+<f-element id="fel-cacert">
+  <title>
+    The OS shall only treat a certificate as a CA certificate if the
+    <h:i>basicConstraints</h:i> extension is present and the CA flag is set to TRUE.
+</title>
+
+
+</f-element>
+</f-component>
+<f-component cc-id="fia_x509_ext.2" name="X.509 Certificate Authentication">
+  <f-element id="fel-cert-auth">
+    <title> The OS shall use X.509v3 certificates as defined by RFC 5280 to support
+    authentication for TLS and
+    <selectables>
+<selectable>DTLS</selectable>
+<selectable>HTTPS</selectable>
+<selectable><assignable>other protocols</assignable></selectable>
+</selectables>
+connections.
+</title>
+
+</f-element>
+</f-component>
+</section>
+<section title="TOE Access (FTA)" id="fta">
+  <f-component cc-id="fta_tab.1" name="Default TOE access banners" status="optional">
+    <f-element id="fel-banner">
+      <title>
+        Before establishing a user session, the <h:b>OS</h:b> shall display an advisory
+        warning message regarding unauthorized use of the OS.
+</title>
+
+</f-element>
+</f-component>
+</section>
+<section title="Trusted Path/Channels (FTP)" id="ftp">
+
+
+  <f-component cc-id="ftp_trp.1" name="Trusted Path">
+    <f-element id="fel-trust-ends">
+      <title>
+	The <h:b>OS</h:b> shall provide a communication path between itself and
+	<selectables><selectable id="s-remote">remote</selectable><selectable id="s-local">local</selectable></selectables>
+	users that is logically distinct from other communication paths and provides assured
+	identification of its endpoints and protection of the communicated data from
+	[modification, disclosure].
+</title>
+
+</f-element>
+<f-element id="fel-trust-users">
+  <title> The <h:b>OS</h:b> shall permit
+  <selectables>
+<selectable>the TSF</selectable>
+<selectable>local users</selectable>
+<selectable>remote users</selectable>
+</selectables>
+to initiate communication via the trusted path.
+</title>
+</f-element>
+<f-element id="fel-trust-path">
+  <title> The <h:b>OS</h:b> shall require use of the trusted path for
+  [[<h:i>all remote administrative actions</h:i>]].
+</title>
+
+
+</f-element>
+</f-component>
+</section>
+</base-pp>
+</st>
