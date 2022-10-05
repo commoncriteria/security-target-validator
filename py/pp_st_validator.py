@@ -63,17 +63,26 @@ class State:
             else:
                 self.handle_mandatory_fcomp(fcomp)
                 
-    def derive_packages_asserts(self):
+    def derive_extdocs_asserts(self):
+    # Derives schematron rules for external documents
         for pack in self.root.findall(".//cc:include-pkg", ns):
-            depends_list = pack.findall("./cc:depends", ns)
-            if depends_list:
-                for depends in depends_list:
-                    if State.is_optional_depends(depends):
-                        continue
-                    for dependency_id in depends.attrib:
-                        self.handle_dependent_package(pack, depends.attrib[dependency_id])
-            else:
-                self.handle_dependent_package(pack, None)
+            self.derive_extdoc_asserts(pack, "package", True)
+
+        for mod in self.root.findall(".//cc:modules/cc:module", ns):
+            self.derive_extdoc_asserts(mod, "module", False)
+
+
+    def derive_extdoc_asserts(self, el, st_el_name, should_add_by_default):
+    # Derives schematron rules for a single external document
+        depends_list = el.findall("./cc:depends", ns)
+        if depends_list:
+            for depends in depends_list:
+                if State.is_optional_depends(depends):
+                    continue
+                for dependency_id in depends.attrib:
+                    self.handle_dependent_doc(el, depends.attrib[dependency_id], st_el_name)
+        elif should_add_by_default:
+            self.handle_dependent_doc(el, None, st_el_name)
 
     def derive_rules_asserts(self):
         for rule in self.root.findall(".//cc:rule[cc:if]", ns):
@@ -92,7 +101,7 @@ class State:
                     
     def derive_schematron(self):
         self.derive_fcomponent_asserts()
-        self.derive_packages_asserts()
+        self.derive_extdocs_asserts()
         self.derive_rules_asserts()
 
     def stringify_and(self, top):
@@ -141,12 +150,12 @@ class State:
     def handle_mandatory_fcomp(self, dependent):
         cc_id = dependent.attrib["cc-id"]
         test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
-        cc_id = cc_id.upper()
+        reason = cc_id.upper()
         if "iteration" in dependent.attrib:
             test += "' and @iteration='"+dependent.attrib['iteration']
-            cc_id="/"+dependent.attrib['iteration']
+            reason += "/"+dependent.attrib['iteration']
         test += "']"
-        reason =  cc_id + " is mandatory and, therefore, must also be included in the ST."
+        reason +=  " is mandatory and, therefore, must also be included in the ST."
         add_assert(self.rule, test, reason)
         
         
@@ -162,12 +171,12 @@ class State:
         add_assert(self.rule, test, reason)
 
                     
-    def handle_dependent_package(self, dependent, dependee_id):
+    def handle_dependent_doc(self, dependent, dependee_id, st_tag):
         baseurl = dependent.find(".//cc:url",ns).text;
         branch =  dependent.find(".//cc:branch",ns).text;
         # test = EXT"//cc:package[cc:git/cc:url='"+baseurl + "' and cc:git/cc:branch='"+branch+"']"\
         #     " or not("+self.ME()+"//cc:selectable[@id='"+dependee_id+"'])"
-        test = "//cc:package[cc:git/cc:url='"+baseurl + "' and cc:git/cc:branch='"+branch+"']"
+        test = "//cc:"+st_tag+"[cc:git/cc:url='"+baseurl + "' and cc:git/cc:branch='"+branch+"']"
         reason = baseurl + "," + branch + "must be included in all STs"
         if dependee_id is not None:
             test += " or not("+self.ME()+"//cc:selectable[@id='"+dependee_id+"'])"
@@ -185,38 +194,24 @@ def make_schematron_skeleton():
 
     patt = SubElement(el, SCH("pattern"))
     patt.attrib["name"]="Basic"
-    rule = SubElement(patt, SCH("rule"))
-    rule.attrib["context"]="/*"
-    return el, rule
+    return el, patt
 
 def add_assert(rule_el, test, descrip):
     assert_el = SubElement(rule_el, SCH("assert"))
     assert_el.attrib["test"]=test
     assert_el.text = descrip
 
-
-# def get_effective_doc(url, branch, fpath):
-#     workdir = tempfile.TemporaryDirectory()
-#     abspath = os.path.abspath(fpath)
-#     commands = ("cd "+workdir.name +
-#                 " && git clone --branch " + branch + " --recursive " + url +
-#                 " && cd * && " +
-#                 " (unset PP_XML; EFF_XML=\"" + abspath + "\"  make effective)")
-#     os.system(commands)
-def validate_st_against_ppdoc(st, pp_str, url):
+def make_root_rule(patt):
+    rule = SubElement(patt, SCH("rule"))
+    rule.attrib["context"]="/*"
+    return rule
+    
+def validate_st_against_ppdoc(st, pp_str, url, patt):
     # print("Looking for "+pp_str)
     pp = lxml.etree.fromstring(pp_str)
-    root, rule = make_schematron_skeleton()
-    add_assert(rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
+    rule = make_root_rule(patt)
     State(pp, rule, url)
-    print(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8').decode("utf-8"))
-    schematron = Schematron(root)
-    res = schematron.validate(st)
-    if res:
-        print("SUCCESS: "+sys.argv[2])
-    else:
-        print("FAILURE: "+sys.argv[2])
-        print(schematron.error_log)
+
 
 def get_str_of_effective(git_el, is_updating, workdir):
         url = git_el.find(CC("url")).text
@@ -257,26 +252,49 @@ def get_all_effectives(st, is_updating, workdir):
     if not(workdir.is_dir()):
         print("The directory to store reference repositories does not exist: "+str(workdir))
         sys.exit(1)
-    for gits in st.findall(".//"+CC("git")):
-        out, url = get_str_of_effective(gits, is_updating, workdir)
+
+    root, patt = make_schematron_skeleton()
+    base_rule = make_root_rule(patt)
+    add_assert(base_rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
+    # add_assert(base_rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
+
+    for git in st.findall(".//"+CC("module")+"/"+CC("git")):
+        out, url = get_str_of_effective(git, is_updating, workdir)
+        validate_st_against_ppdoc(st, out, url, patt)
+    
+    for git in st.findall(".//"+CC("base-pp")+"/"+CC("git")):
+        out, url = get_str_of_effective(git, is_updating, workdir)
+        validate_st_against_ppdoc(st, out, url, patt)
+        
+    for git in st.findall(".//"+CC("package")+"/"+CC("git")):
+        out, url = get_str_of_effective(git, is_updating, workdir)
+        validate_st_against_ppdoc(st, out, url, patt)
+    print(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8').decode("utf-8"))
+    schematron = Schematron(root)
+    res = schematron.validate(st)
+    if res:
+        print("SUCCESS: "+sys.argv[2])
+    else:
+        print("FAILURE: "+sys.argv[2])
+        print(schematron.error_log)
+        
         # eff_xml_str = subprocess.check_output("EFF_XML='&1' make -s effective", shell=True, text=True)
         # #pp_doc = lxml.etree.fromparse(eff_xml_str)
         # os.system("EFF_XML=effective.xml make effective")
-        validate_st_against_ppdoc(st, out, url)
         # pp_doc = lxml.etree.parse("effective.xml")
-        # print("proj: "+projname)
-        # print("Git: "+url)
                     
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: [--dont-update] [<work-dir>] <st-xml>")
+        print("Usage: [-v] [--dont-update] [<work-dir>] <st-xml>")
 #        print("Usage: <pp-xml> <st-xml>")
         sys.exit(0)
 
     curr = 1
     should_update = True
+    if sys.argv[curr] == "-v":
+        is_verbose = True
+        curr+=1
     if sys.argv[curr] == "--dont-update":
-        print("Dont update")
         should_update = False
         curr+=1
     workdir=Path.home()/"commoncriteria/ref-repo"
