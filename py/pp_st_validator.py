@@ -136,6 +136,8 @@ class State:
             magic= " and "
         return ret+")"
 
+
+    
     def handle_mandatory_fcomp(self, dependent):
         cc_id = dependent.attrib["cc-id"]
         test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
@@ -215,15 +217,10 @@ def validate_st_against_ppdoc(st, pp_str, url):
     else:
         print("FAILURE: "+sys.argv[2])
         print(schematron.error_log)
-    
-def get_all_effectives(st, is_updating, workdir):
-    mydir=(Path(".")/"mock-transforms").resolve()
-    if not(workdir.is_dir()):
-        print("The directory to store reference repositories does not exist: "+str(workdir))
-        sys.exit(1)
-    for gits in st.findall(".//"+CC("git")):
-        url = gits.find(CC("url")).text
-        branch = gits.find(CC("branch")).text
+
+def get_str_of_effective(git_el, is_updating, workdir):
+        url = git_el.find(CC("url")).text
+        branch = git_el.find(CC("branch")).text
         projname = url.rsplit('/', 1)[-1]
         projdir = workdir/projname
         # TODO make this system agnostic
@@ -237,7 +234,7 @@ def get_all_effectives(st, is_updating, workdir):
             os.system("git pull -f --all")
         os.system("git checkout " + branch)
         try:
-            commit_el = gits.find(CC("commit"))
+            commit_el = git_el.find(CC("commit"))
             revert_cmd = "git reset --hard "+commit_el.text
 #            revert_cmd = "git revert  -n "+commit_el.text
             os.system(revert_cmd)
@@ -247,9 +244,21 @@ def get_all_effectives(st, is_updating, workdir):
         env=dict(os.environ, TRANS=str(mydir))
         # subprocess.Popen(['make', '-s'], env=env).wait()
         # sys.exit(0)
-
+        # This uses 'make' to build the effective PP because
+        # the project may have adjusted the hooks, so the
         process = subprocess.Popen("make -s", env=env, shell=True,text=True, stdout=subprocess.PIPE)
         out,err = process.communicate()
+        return out, url
+
+# os.path.realpath(__file__)
+mydir=(Path(os.path.dirname(__file__))/".."/"mock-transforms").resolve()
+    
+def get_all_effectives(st, is_updating, workdir):
+    if not(workdir.is_dir()):
+        print("The directory to store reference repositories does not exist: "+str(workdir))
+        sys.exit(1)
+    for gits in st.findall(".//"+CC("git")):
+        out, url = get_str_of_effective(gits, is_updating, workdir)
         # eff_xml_str = subprocess.check_output("EFF_XML='&1' make -s effective", shell=True, text=True)
         # #pp_doc = lxml.etree.fromparse(eff_xml_str)
         # os.system("EFF_XML=effective.xml make effective")
