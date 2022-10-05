@@ -15,6 +15,27 @@
     </git>
 
     <modified-sfrs>
+
+      <f-component cc-id="fdp_ifc_ext.1" name="Information flow control" status="sel-based">
+	<depends on="s-itc-ipsec"/>
+	<depends><optional/></depends>
+	<f-element id="fel-dit-vpn">
+	  <title> The OS shall
+	  <selectables linebreak="yes">
+	    <selectable>provide an interface which allows a VPN client to protect all IP traffic using IPsec</selectable>
+	    <selectable id="s-provides-vpnclient"><snip>provide a VPN client</snip> that can protect all IP traffic using IPsec</selectable>
+	  </selectables>
+	  with the exception of IP traffic required to establish the VPN connection
+	  and
+	  <selectables>
+	    <selectable>signed updates directly from the OS vendor</selectable>
+	  </selectables>
+	  .
+	  </title>
+	</f-element>
+      </f-component>
+      
+
       
     <f-component cc-id="fcs_ckm.1" id="os-fcs-ckm-1" name="Cryptographic Key Generation">
       <f-element id="os-fcs-ckm-1e1">
@@ -2517,30 +2538,9 @@ of the keys and hashes that it will generate.
 </f-element>
 </f-component>
 
-<ext-comp-def fam-id="FDP_IFC_EXT" title="Information flow control">
-  <fam-behavior>This family of requirements defines how flows of information are controlled.</fam-behavior>
-</ext-comp-def>
-
-<f-component cc-id="fdp_ifc_ext.1" name="Information flow control" status="sel-based">
-  <depends on="s-itc-ipsec"/>
-<depends><optional/></depends>
-<f-element id="fel-dit-vpn">
-  <title> The OS shall
-  <selectables linebreak="yes">
-<selectable>provide an interface which allows a VPN client to protect all IP traffic using IPsec</selectable>
-<selectable id="s-provides-vpnclient"><snip>provide a VPN client</snip> that can protect all IP traffic using IPsec</selectable>
-</selectables>
-with the exception of IP traffic required to establish the VPN connection
-and
-<selectables>
-<selectable>signed updates directly from the OS vendor</selectable>
-</selectables>
-.
-</title>
 
 
-</f-element>
-</f-component>
+
 </section>
 <section title="Security Management (FMT)" id="fmt">
   <ext-comp-def fam-id="FMT_MOF_EXT" title="Management of security functions behavior">

@@ -64,10 +64,13 @@ class State:
                 self.handle_mandatory_fcomp(fcomp)
                 
     def derive_extdocs_asserts(self):
-    # Derives schematron rules for external documents
+        # Derives schematron rules for external documents
+
+        
         for pack in self.root.findall(".//cc:include-pkg", ns):
             self.derive_extdoc_asserts(pack, "package", True)
 
+        # Here we have to keep track of the base that's being served
         for mod in self.root.findall(".//cc:modules/cc:module", ns):
             self.derive_extdoc_asserts(mod, "module", False)
 
@@ -205,13 +208,21 @@ def make_root_rule(patt):
     rule = SubElement(patt, SCH("rule"))
     rule.attrib["context"]="/*"
     return rule
-    
-def validate_st_against_ppdoc(st, pp_str, url, patt):
-    # print("Looking for "+pp_str)
+
+# Patt is carrying the results back
+def derive_rule_from_ppdoc(pp_str, url, patt, base_url=None):
     pp = lxml.etree.fromstring(pp_str)
     rule = make_root_rule(patt)
     State(pp, rule, url)
-
+    if base_url is not None:
+        xpath=(".//cc:base-pp[cc:git/cc:url/text()='"+base_url+"']")
+#        xpath=(".//"+CC("base-pp[")+CC("git/")+CC("url/text()='")+base_url+"']")
+        base_el = pp.xpath(xpath, namespaces=ns)
+        if len(base_el) != 1:
+            print("Expected exactly 1 base-pp in the module")
+            sys.exit(1)
+        for modsfr in base_el[0].findall(CC("modified-sfrs//")+CC("f-component")):
+            print("Detected Modified: " + modsfr.attrib["cc-id"])
 
 def get_str_of_effective(git_el, is_updating, workdir):
         url = git_el.find(CC("url")).text
@@ -258,17 +269,25 @@ def get_all_effectives(st, is_updating, workdir):
     add_assert(base_rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
     # add_assert(base_rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
 
+    base_el = st.findall(".//"+CC("base-pp"))
+    if len(base_el) != 1:
+        print("Expected one base-pp element. Found " + len(base_el))
+        sys.exit(1)
+        
+    baseurl = base_el[0].find(CC("git/")+CC("url")).text
     for git in st.findall(".//"+CC("module")+"/"+CC("git")):
         out, url = get_str_of_effective(git, is_updating, workdir)
-        validate_st_against_ppdoc(st, out, url, patt)
-    
+        derive_rule_from_ppdoc(out, url, patt, base_url= baseurl)
+        
+
+    # Should be exactly one base-pp
     for git in st.findall(".//"+CC("base-pp")+"/"+CC("git")):
         out, url = get_str_of_effective(git, is_updating, workdir)
-        validate_st_against_ppdoc(st, out, url, patt)
-        
+        derive_rule_from_ppdoc(out, url, patt)
+    
     for git in st.findall(".//"+CC("package")+"/"+CC("git")):
         out, url = get_str_of_effective(git, is_updating, workdir)
-        validate_st_against_ppdoc(st, out, url, patt)
+        derive_rule_from_ppdoc(out, url, patt)
     print(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8').decode("utf-8"))
     schematron = Schematron(root)
     res = schematron.validate(st)
