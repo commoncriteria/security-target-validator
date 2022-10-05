@@ -21,3 +21,6 @@ The contents of each document's section looks similar and most of it really does
 What does matter is that items with IDs are preserved with ID attribute intact, if they are part of the ST, and removed if they are not.
 Basically if you're choosing a selection keep it in (unchanged) and if you're choosing not to make it part of the ST, remove it entirely.
 
+# Status
+Before beta release, or even alpha.
+It does not handle cc modules right now.
