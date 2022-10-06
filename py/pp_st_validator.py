@@ -12,6 +12,10 @@ import lxml.etree
 import os
 import subprocess
 from pathlib import Path
+from enum import Enum, auto
+
+class mod_type(Enum):
+    REPLACE = auto()
 
 ns = {'cc': "https://niap-ccevs.org/cc/v1",
       'sec': "https://niap-ccevs.org/cc/v1/section",
@@ -25,13 +29,13 @@ def CC(tag):
 
 class State:
     """ This class represents the Protection Profile document. """
-    def __init__(self, root, rule, url):
+    def __init__(self, root, rule, url, modsfrs, base_url):
         self.root = root
-        self.parent_map = {c: p for p in self.root.iter() for c in p}
+#        self.parent_map = {c: p for p in self.root.iter() for c in p}
         self.rule = rule
         self.url = url
-        self.derive_schematron()
-
+        self.modsfrs = modsfrs
+        self.derive_schematron(base_url)
         
     def is_foreign_depends(el):
         child = el.find("./*")        
@@ -51,29 +55,46 @@ class State:
     def ME(self):
         return self.EXT(self.url)
 
-    def derive_fcomponent_asserts(self):
-        for fcomp in self.root.findall(".//cc:f-component", ns):
+    def get_non_opt_comps(self, base_url):
+        if base_url is None:
+            xpath_str = ".//cc:f-component[not(ancestor::cc:obj-sfrs|ancestor::cc:opt-sfrs)]"
+
+        else:
+            xpath_str = ".//cc:base-pp[cc:git/cc:url/text()='"+base_url+"']//cc:f-component|.//cc:man-sfrs//cc:f-component|.//cc:sel-sfrs//cc:f-component|.//cc:impl-dep-sfrs//cc:f-component"
+        return self.root.xpath(xpath_str, namespaces=ns)
+
+    def derive_fcomponent_asserts(self, base_url):
+        fcomps = self.get_non_opt_comps(base_url)
+        for fcomp in fcomps:
+            cc_id = fcomp.attrib["cc-id"]
+            if cc_id in self.modsfrs:
+                # TODO: There are times when we're not replacing
+                # the whole SFR and just replace
+                # The depends
+                if self.modsfrs[cc_id]==mod_type.REPLACE:
+                    continue
+                else:
+                    print("Can only handle full replace now")
+                    sys.exit(1)
             dependses = fcomp.findall("./cc:depends", ns)
+
             if dependses:
                 for depends in dependses:
                     if State.is_optional_depends(depends):
                         continue
-                    for dependency_id in depends.attrib:
-                        self.handle_dependent_fcomp(fcomp, depends.attrib[dependency_id])
+                    for attr in depends.attrib:
+                        dependency_id = depends.attrib[attr]
+                        self.handle_fcomp(fcomp, dependee_id=dependency_id)
             else:
-                self.handle_mandatory_fcomp(fcomp)
+                self.handle_fcomp(fcomp)
                 
     def derive_extdocs_asserts(self):
         # Derives schematron rules for external documents
-
-        
         for pack in self.root.findall(".//cc:include-pkg", ns):
             self.derive_extdoc_asserts(pack, "package", True)
-
         # Here we have to keep track of the base that's being served
         for mod in self.root.findall(".//cc:modules/cc:module", ns):
             self.derive_extdoc_asserts(mod, "module", False)
-
 
     def derive_extdoc_asserts(self, el, st_el_name, should_add_by_default):
     # Derives schematron rules for a single external document
@@ -100,10 +121,9 @@ class State:
             if "id" in rule.attrib:
                 reason = "Rule (IF/THEN) id:'"+rule.attrib["id"]+"'"
             add_assert(self.rule, test , reason)
-        
                     
-    def derive_schematron(self):
-        self.derive_fcomponent_asserts()
+    def derive_schematron(self, base_url):
+        self.derive_fcomponent_asserts(base_url)
         self.derive_extdocs_asserts()
         self.derive_rules_asserts()
 
@@ -134,7 +154,6 @@ class State:
                 Error("Blah")
         return ret+")"
 
-
     def stringify_refid(self, ref_el):
         return self.ME()+"//cc:*[@id='"+ref_el.text+"']"
 
@@ -147,10 +166,8 @@ class State:
             ret += magic + self.EXT(doc_url)+"//*[@id='" +kid.text+"']"
             magic= " and "
         return ret+")"
-
-
     
-    def handle_mandatory_fcomp(self, dependent):
+    def handle_fcomp(self, dependent, dependee_id=None):
         cc_id = dependent.attrib["cc-id"]
         test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
         reason = cc_id.upper()
@@ -158,21 +175,12 @@ class State:
             test += "' and @iteration='"+dependent.attrib['iteration']
             reason += "/"+dependent.attrib['iteration']
         test += "']"
-        reason +=  " is mandatory and, therefore, must also be included in the ST."
+        reason +=  " is mandatory and, therefore, must also be included in the ST.("
+        if dependee_id is not None:
+            test += " or not("+self.ME()+"//*[@id='"+dependee_id+"'])"
+            reason = "If '"+dependee_id+"' is selected, then " + cc_id + " must also be included.("
+        reason += self.url + ")"
         add_assert(self.rule, test, reason)
-        
-        
-    def handle_dependent_fcomp(self, dependent, dependee_id):
-        cc_id = dependent.attrib["cc-id"]
-        test = self.ME()+"//cc:f-component[@cc-id='"+cc_id
-        cc_id = cc_id.upper()
-        if "iteration" in dependent.attrib:
-            test += "' and @iteration='"+dependent.attrib['iteration']
-            cc_id="/"+dependent.attrib['iteration']
-        test += "'] or not("+self.ME()+"//*[@id='"+dependee_id+"'])"
-        reason = "If '"+dependee_id+"' is selected, then " + cc_id + " must also be included."
-        add_assert(self.rule, test, reason)
-
                     
     def handle_dependent_doc(self, dependent, dependee_id, st_tag):
         baseurl = dependent.find(".//cc:url",ns).text;
@@ -185,7 +193,6 @@ class State:
             test += " or not("+self.ME()+"//cc:selectable[@id='"+dependee_id+"'])"
             reason = "When selecting '" + dependee_id +"', you need to include " + baseurl + ", " + branch
         add_assert(self.rule, test, reason)
-
 
 def make_schematron_skeleton():
     el = Element(SCH("schema"))
@@ -210,19 +217,23 @@ def make_root_rule(patt):
     return rule
 
 # Patt is carrying the results back
-def derive_rule_from_ppdoc(pp_str, url, patt, base_url=None):
+# base_url is only not none for modules
+def derive_rule_from_ppdoc(pp_str, url, patt, modsfrs, base_url=None):
     pp = lxml.etree.fromstring(pp_str)
     rule = make_root_rule(patt)
-    State(pp, rule, url)
-    if base_url is not None:
-        xpath=(".//cc:base-pp[cc:git/cc:url/text()='"+base_url+"']")
-#        xpath=(".//"+CC("base-pp[")+CC("git/")+CC("url/text()='")+base_url+"']")
-        base_el = pp.xpath(xpath, namespaces=ns)
-        if len(base_el) != 1:
-            print("Expected exactly 1 base-pp in the module")
-            sys.exit(1)
-        for modsfr in base_el[0].findall(CC("modified-sfrs//")+CC("f-component")):
-            print("Detected Modified: " + modsfr.attrib["cc-id"])
+    State(pp, rule, url, modsfrs, base_url)
+    if base_url is None:
+        return
+    xpath=(".//cc:base-pp[cc:git/cc:url/text()='"+base_url+"']")
+    base_el = pp.xpath(xpath, namespaces=ns)
+    if len(base_el) != 1:
+        print("Expected exactly 1 base-pp in the module")
+        sys.exit(1)
+    for modsfr in base_el[0].findall(CC("modified-sfrs//")+CC("f-component")):
+        cc_id = modsfr.attrib["cc-id"]
+        modsfrs[cc_id]=mod_type.REPLACE
+    return
+        
 
 def get_str_of_effective(git_el, is_updating, workdir):
         url = git_el.find(CC("url")).text
@@ -249,7 +260,6 @@ def get_str_of_effective(git_el, is_updating, workdir):
 
         env=dict(os.environ, TRANS=str(mydir))
         # subprocess.Popen(['make', '-s'], env=env).wait()
-        # sys.exit(0)
         # This uses 'make' to build the effective PP because
         # the project may have adjusted the hooks, so the
         process = subprocess.Popen("make -s", env=env, shell=True,text=True, stdout=subprocess.PIPE)
@@ -266,28 +276,28 @@ def get_all_effectives(st, is_updating, workdir):
 
     root, patt = make_schematron_skeleton()
     base_rule = make_root_rule(patt)
-    add_assert(base_rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
-    # add_assert(base_rule, "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])", "Exclusive with selectable ")
+    add_assert(base_rule,
+               "not(//cc:selectable[@exclusive='yes' and preceding-sibling::cc:selectable])",
+               "Exclusive with selectable ")
 
     base_el = st.findall(".//"+CC("base-pp"))
     if len(base_el) != 1:
         print("Expected one base-pp element. Found " + len(base_el))
         sys.exit(1)
-        
     baseurl = base_el[0].find(CC("git/")+CC("url")).text
+    modsfrs = {}
     for git in st.findall(".//"+CC("module")+"/"+CC("git")):
         out, url = get_str_of_effective(git, is_updating, workdir)
-        derive_rule_from_ppdoc(out, url, patt, base_url= baseurl)
-        
+        derive_rule_from_ppdoc(out, url, patt, modsfrs, base_url= baseurl)
 
     # Should be exactly one base-pp
     for git in st.findall(".//"+CC("base-pp")+"/"+CC("git")):
         out, url = get_str_of_effective(git, is_updating, workdir)
-        derive_rule_from_ppdoc(out, url, patt)
+        derive_rule_from_ppdoc(out, url, patt, modsfrs)
     
     for git in st.findall(".//"+CC("package")+"/"+CC("git")):
         out, url = get_str_of_effective(git, is_updating, workdir)
-        derive_rule_from_ppdoc(out, url, patt)
+        derive_rule_from_ppdoc(out, url, patt, {})
     print(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8').decode("utf-8"))
     schematron = Schematron(root)
     res = schematron.validate(st)

@@ -11,11 +11,137 @@
     <git>
       <url>https://github.com/commoncriteria/vpnclient</url>
       <branch>v2.4</branch>
-      <commit>0dbd085b0f306e0573143d72f0cbb38b57730c5d</commit>
+      <commit>4079be8e7b03cc8ea38ed994939473d655f0a889</commit>
     </git>
 
     <modified-sfrs>
 
+	 <f-component cc-id="fmt_smf_ext.1" id="md-fmt-smf-ext-1" name="Specification of Management Functions">
+	      <consistency-rationale>This PP-Module modifies management function 45 regarding Always-on VPN protection. </consistency-rationale>
+		<f-element id="md-fmt-smf-ext-1-1">
+		 <title>
+			This SFR is not reproduced in its entirety for size purposes. The only change to this SFR is the following
+			change to management function 45:
+			<h:table border="1" style="width:100%">
+				<h:tr>
+				<h:td>
+					45. enable/disable the Always On VPN protection:<h:br/>
+					-   a. across device<h:br/>
+					-   [<h:i>d. no other method</h:i>]
+					</h:td>
+					<h:td><h:b>M</h:b></h:td>
+					<h:td>O</h:td>
+					<h:td>O</h:td>
+					<h:td>O</h:td>
+				</h:tr>
+			 </h:table>
+		 </title>
+               <aactivity> 
+                Refer to the EAs for FMT_SMF_EXT.1 in the MDF PP. The only change to this SFR is the change to management function 45. 
+		       Testing of all other functions is not affected.
+                <no-tests/>
+              </aactivity>
+	</f-element>
+	<audit-event/>
+	</f-component>
+
+
+          <f-component cc-id="ftp_itc_ext.1" id="md-ftp-itc-ext-1" name="Trusted Channel Communication">
+            <f-element id="md-ftp-itc-ext-1e1">
+              <title>The TSF shall use<h:ul>
+		      <h:li>802.11-2012 in accordance with the Extended Package for WLAN Clients</h:li>
+		      <h:li>802.1X in accordance with the Extended Package for WLAN Clients</h:li>
+		      <h:li>EAP-TLS in accordance with the Extended Package for WLAN Clients</h:li>
+		      <h:li>mutually authenticated TLS as defined in the Package for Transport Layer
+			      Security</h:li>
+		      <h:li><h:b>IPsec in accordance with the PP-Module for VPN Client</h:b></h:li></h:ul>
+		      and
+                <selectables>
+                  <selectable>mutually authenticated DTLS as defined in the Package for Transport
+			Layer Security</selectable>
+                  <selectable>HTTPS</selectable>
+                </selectables>
+                protocols to provide a communication channel between itself
+                and another trusted IT product that is logically distinct from other
+                communication channels, provides assured identification of its end points,
+                protects channel data from disclosure, and detects modification of the channel
+                data.
+                </title>
+            </f-element>
+            <f-element id="md-ftp-itc-ext-1e2">
+              <title>The TSF shall permit the TSF to initiate communication via the trusted channel.
+              </title>
+            </f-element>
+            <f-element id="md-ftp-itc-ext-1e3">
+              <title>
+                The TSF shall initiate communication via the trusted channel for wireless access
+                point connections, administrative communication, configured enterprise
+                connections, and 
+                <selectables>
+                  <selectable>OTA updates</selectable>
+                </selectables>.
+              </title>
+            </f-element>
+          </f-component>
+	
+          <f-component cc-id="fcs_ckm.1" id="os-fcs-ckm-1" name="Cryptographic Key Generation">
+            <consistency-rationale>The ST author is instructed to make specific selections at minimum to
+              address VPN client requirements; the SFR behavior itself is
+              unmodified.</consistency-rationale>
+            <f-element id="os-fcs-ckm-1e1">
+              <title><h:b>The OS shall generate asymmetric cryptographic keys in accordance with a specified
+                cryptographic key generation algorithm: 
+                <h:ul><h:i>
+                  <h:li>ECC schemes using “NIST curves” P-256, P-384, and <selectables>
+                    <selectable exclusive="yes">no other curves</selectable>
+                  </selectables>
+                    that meet the following: FIPS PUB 186-4, “Digital Signature
+                    Standard (DSS),” Appendix B.4, and,
+                  </h:li></h:i>
+                </h:ul></h:b>
+                <selectables linebreak="yes">
+                  <selectable>RSA schemes using cryptographic key sizes of 2048-bit or greater that meet
+                    the following: FIPS PUB 186-4, “Digital Signature Standard (DSS),”
+                    Appendix B.3</selectable>
+                  <selectable>FFC schemes using cryptographic key sizes of 2048-bit or greater that meet
+                    the following: FIPS PUB 186-4, “Digital Signature Standard (DSS),”
+                    Appendix B.1</selectable> 
+                  <selectable>FFC Schemes using Diffie-Hellman group 14 that meet the following: RFC
+                    3526</selectable>
+                  <selectable>FFC Schemes using safe primes that meet the following: ‘NIST Special
+                    Publication 800-56A Revision 3, “Recommendation for Pair-Wise Key
+                    Establishment Schemes</selectable>
+                </selectables>
+                <h:s>and specified cryptographic key sizes [assignment: cryptographic key sizes] that
+                  meet the following: [assignment: list of standards]</h:s>.
+                </title>
+            </f-element>
+            <audit-event/>
+          </f-component>
+
+      
+          <f-component cc-id="fia_x509_ext.2" id="md-fia-x509-ext-2" name="X.509 Certificate Authentication">
+            <consistency-rationale>This PP-Module adds IPsec as a new trusted protocol where x.509
+              certificate authentication is used.</consistency-rationale>
+            <f-element id="md-fia-x509-ext-2e1">
+              <title>The TSF shall use X.509v3 certificates as defined by RFC 5280 to support
+                authentication for mutually authenticated TLS as defined in the Package for
+				Transport Layer Security, HTTPS, IPsec in accordance with the PP-Module for
+				VPN Client, 
+					<selectables>
+						<selectable> mutually authenticated DTLS as defined in the Package
+							for Transport Layer Security</selectable>
+
+					</selectables>, and
+					<selectables>
+                  <selectable>code signing for system software updates</selectable>
+                  <selectable>code signing for mobile applications</selectable>
+                  <selectable>code signing for integrity verification</selectable>
+                  <selectable><assignable>other uses</assignable></selectable>
+                </selectables>.
+              </title>
+	    </f-element>
+	  </f-component>
       <f-component cc-id="fdp_ifc_ext.1" name="Information flow control" status="sel-based">
 	<depends on="s-itc-ipsec"/>
 	<depends><optional/></depends>
@@ -2209,6 +2335,85 @@
       <branch>release-4.3</branch>
       <commit>3566d59e9044a973a9c0a039d014f162fe63e21c</commit>
     </git>
+      	<f-component cc-id="ftp_itc_ext.1" name="Trusted channel communication">
+      	  <f-element id="fel-trust-comms">
+      	    <title>
+              The OS shall use
+      	      <selectables linebreak='yes'>
+                <selectable id="tls">TLS as conforming to the <h:a href="https://www.niap-ccevs.org/pp/"><h:i>Package for Transport Layer Security</h:i></h:a></selectable>
+                <selectable id="dtls">DTLS as conforming to the <h:a href="https://www.niap-ccevs.org/pp/"><h:i>Package for Transport Layer Security</h:i></h:a></selectable>
+      	        <selectable>IPsec as conforming to the <h:a href="https://www.niap-ccevs.org/pp/"><h:i>EP for IPsec VPN Clients</h:i></h:a></selectable>
+      	        <selectable>SSH as conforming to the <h:a href="https://www.niap-ccevs.org/pp/"><h:i>EP for Secure Shell</h:i></h:a></selectable>
+        	    </selectables>
+		    to provide a trusted communication channel between itself and
+		    authorized IT entities supporting the following capabilities:
+		    <selectables>
+		      <selectable>audit server</selectable>
+		      <selectable>authentication server</selectable>
+		      <selectable>management server</selectable>
+		      <selectable><assignable>other capabilities</assignable></selectable>
+		    </selectables>
+		    that is logically distinct from other communication
+		    channels and provides assured identification of its end points and protection of the channel
+		    data from disclosure and detection of modification of the channel data.
+      	    </title>
+      	  </f-element>
+      	</f-component>
+
+        <f-component cc-id="fia_x509_ext.2" name="X.509 Certificate Authentication">
+          <f-element id="fel-cert-auth">
+            <title> The OS shall use X.509v3 certificates as defined by RFC 5280 to support
+              authentication for TLS and
+			  <selectables>
+			  <selectable>DTLS</selectable>
+			  <selectable>HTTPS</selectable>
+			  <selectable><assignable>other protocols</assignable></selectable>
+			  </selectables>
+			  connections.
+			</title>
+          </f-element>
+        </f-component>
+
+	<f-component cc-id="fmt_smf_ext.1" name="Specification of Management Functions">
+	  <f-element id="fel-manage-functions">
+	    <title>
+	      The OS shall be capable of performing the following management functions:
+	      <h:br/>
+	      <management-function-set default="O">
+		<manager cid="a">Administrator</manager>
+		<manager cid="u">User</manager>
+		<management-function><text>Enable/disable <selectables><selectable>screen lock</selectable><selectable>session timeout</selectable></selectables></text><M ref="a"/></management-function>
+		<management-function><text>Configure <selectables><selectable>screen lock</selectable><selectable>session</selectable></selectables> inactivity timeout</text><M ref="a"/></management-function>
+		<management-function><text>Configure local audit storage capacity</text></management-function>
+		<management-function><text>Configure minimum password length</text></management-function>
+		<management-function><text>Configure minimum number of special characters in password</text></management-function>
+		<management-function><text>Configure minimum number of numeric characters in password</text></management-function>
+		<management-function><text>Configure minimum number of uppercase characters in password</text></management-function>
+		<management-function><text>Configure minimum number of lowercase characters in password</text></management-function>
+		<management-function><text>
+Configure lockout policy for unsuccessful authentication attempts through
+                  <selectables>
+		    <selectable>timeouts between attempts</selectable>
+		    <selectable>limiting number of attempts during a time period</selectable>
+		  </selectables>
+		</text></management-function>
+		<management-function><text>Configure host-based firewall</text></management-function>
+		<management-function><text>Configure name/address of directory server with which to bind</text></management-function>
+		<management-function><text>Configure name/address of remote management server from which to receive management settings</text></management-function>
+		<management-function><text>Configure name/address of audit/logging server to which to send audit/logging records</text></management-function>
+		<management-function><text>Configure audit rules</text></management-function>
+		<management-function><text>Configure name/address of network time server</text></management-function>
+		<management-function><text>Enable/disable automatic software update</text></management-function>
+		<management-function><text>Configure WiFi interface</text></management-function>
+		<management-function><text>Enable/disable Bluetooth interface</text></management-function>
+		<management-function><text>Enable/disable <assignable> list of other external interfaces</assignable></text></management-function>
+		<management-function><text><assignable>list of other management functions to be provided by the TSF</assignable></text></management-function>
+	      </management-function-set>
+	      .
+	    </title>
+	  </f-element>
+	</f-component>
+
     <f-component cc-id="fcs_ckm.1" name="Cryptographic Key Generation (Refined)">
       <f-element id="fel-asym-gen">
 	<title> The <h:b>OS</h:b> shall generate <h:b>asymmetric</h:b> cryptographic keys in accordance with a
@@ -2239,34 +2444,34 @@
   </f-element>
 </f-component>
 
-<f-component cc-id="ftp_itc_ext.1" name="Trusted channel communication">
-  <f-element id="fel-trust-comms">
-    <title>
-      The OS shall use
-      <selectables linebreak='yes'>
-        <selectable id="tls">
-	  <snip>TLS</snip> as conforming to the <xref to="pkg-tls"/> as a
-    	  <selectables><selectable id="s-tls-client"><readable>client(TLS)</readable>client</selectable><selectable id="s-tls-server"><readable>server(TLS)</readable>server</selectable></selectables>
-	</selectable>
-        <selectable id="dtls"><snip>DTLS</snip> as conforming to the <xref to="pkg-tls"/> as a
-    	<selectables><selectable id="s-dtls-client"><readable>client(DTLS)</readable>client</selectable><selectable id="s-dtls-server"><readable>server(DTLS)</readable>server</selectable></selectables>
-      </selectable>
+<!-- <f-component cc-id="ftp_itc_ext.1" name="Trusted channel communication"> -->
+<!--   <f-element id="fel-trust-comms"> -->
+<!--     <title> -->
+<!--       The OS shall use -->
+<!--       <selectables linebreak='yes'> -->
+<!--         <selectable id="tls"> -->
+<!-- 	  <snip>TLS</snip> as conforming to the <xref to="pkg-tls"/> as a -->
+<!--     	  <selectables><selectable id="s-tls-client"><readable>client(TLS)</readable>client</selectable><selectable id="s-tls-server"><readable>server(TLS)</readable>server</selectable></selectables> -->
+<!-- 	</selectable> -->
+<!--         <selectable id="dtls"><snip>DTLS</snip> as conforming to the <xref to="pkg-tls"/> as a -->
+<!--     	<selectables><selectable id="s-dtls-client"><readable>client(DTLS)</readable>client</selectable><selectable id="s-dtls-server"><readable>server(DTLS)</readable>server</selectable></selectables> -->
+<!--       </selectable> -->
 
-    </selectables>
-    to provide a trusted communication channel between itself and
-    authorized IT entities supporting the following capabilities:
-    <selectables>
-      <selectable>audit server</selectable>
-      <selectable>authentication server</selectable>
-      <selectable>management server</selectable>
-      <selectable><assignable>other capabilities</assignable></selectable>
-    </selectables>
-    that is logically distinct from other communication
-    channels and provides assured identification of its end points and protection of the channel
-    data from disclosure and detection of modification of the channel data.
-  </title>
-</f-element>
-</f-component>
+<!--     </selectables> -->
+<!--     to provide a trusted communication channel between itself and -->
+<!--     authorized IT entities supporting the following capabilities: -->
+<!--     <selectables> -->
+<!--       <selectable>audit server</selectable> -->
+<!--       <selectable>authentication server</selectable> -->
+<!--       <selectable>management server</selectable> -->
+<!--       <selectable><assignable>other capabilities</assignable></selectable> -->
+<!--     </selectables> -->
+<!--     that is logically distinct from other communication -->
+<!--     channels and provides assured identification of its end points and protection of the channel -->
+<!--     data from disclosure and detection of modification of the channel data. -->
+<!--   </title> -->
+<!-- </f-element> -->
+<!-- </f-component> -->
 
 <f-component cc-id="fcs_ckm.2" name="Cryptographic Key Establishment (Refined)">
   <f-element id="fel-crypt-key-estab">
@@ -2560,48 +2765,48 @@ of the keys and hashes that it will generate.
 <ext-comp-def fam-id="FMT_SMF_EXT" title="Specification of Management Functions">
 <fam-behavior>This family of requirements defines the management of security functions. </fam-behavior>
 </ext-comp-def>
-<f-component cc-id="fmt_smf_ext.1" name="Specification of Management Functions">
-  <f-element id="fel-manage-functions">
-    <title>
-      The OS shall be capable of performing the following management functions:
-      <h:br/>
-      <management-function-set default="O">
-	<manager cid="a">Administrator</manager>
-<manager cid="u">User</manager>
-<management-function><text>Enable/disable <selectables><selectable>screen lock</selectable><selectable>session timeout</selectable></selectables></text><M ref="a"/></management-function>
-<management-function><text>Configure <selectables><selectable>screen lock</selectable><selectable>session</selectable></selectables> inactivity timeout</text><M ref="a"/></management-function>
-<management-function><text>import keys/secrets into  the secure key storage</text></management-function>
-<management-function><text>Configure local audit storage capacity</text></management-function>
-<management-function><text>Configure minimum password length</text></management-function>
-<management-function><text>Configure minimum number of special characters in password</text></management-function>
-<management-function><text>Configure minimum number of numeric characters in password</text></management-function>
-<management-function><text>Configure minimum number of uppercase characters in password</text></management-function>
-<management-function><text>Configure minimum number of lowercase characters in password</text></management-function>
-<management-function><text>
-  Configure lockout policy for unsuccessful authentication attempts through
-  <selectables>
-<selectable>timeouts between attempts</selectable>
-<selectable>limiting number of attempts during a time period</selectable>
-</selectables>
-</text></management-function>
-<management-function><text>Configure host-based firewall</text></management-function>
-<management-function><text>Configure name/address of directory server with which to bind</text></management-function>
-<management-function><text>Configure name/address of remote management server from which to receive management settings</text></management-function>
-<management-function><text>Configure name/address of audit/logging server to which to send audit/logging records</text></management-function>
-<management-function><text>Configure audit rules</text></management-function>
-<management-function><text>Configure name/address of network time server</text></management-function>
-<management-function><text>Enable/disable automatic software update</text></management-function>
-<management-function><text>Configure Wi-Fi interface</text></management-function>
-<management-function><text>Enable/disable Bluetooth interface</text></management-function>
-<management-function><text>Enable/disable <assignable> list of other external interfaces</assignable></text></management-function>
-<management-function><text><assignable>list of other management functions to be provided by the TSF</assignable></text></management-function>
-</management-function-set>
-.
-</title>
+<!-- <f-component cc-id="fmt_smf_ext.1" name="Specification of Management Functions"> -->
+<!--   <f-element id="fel-manage-functions"> -->
+<!--     <title> -->
+<!--       The OS shall be capable of performing the following management functions: -->
+<!--       <h:br/> -->
+<!--       <management-function-set default="O"> -->
+<!-- 	<manager cid="a">Administrator</manager> -->
+<!-- <manager cid="u">User</manager> -->
+<!-- <management-function><text>Enable/disable <selectables><selectable>screen lock</selectable><selectable>session timeout</selectable></selectables></text><M ref="a"/></management-function> -->
+<!-- <management-function><text>Configure <selectables><selectable>screen lock</selectable><selectable>session</selectable></selectables> inactivity timeout</text><M ref="a"/></management-function> -->
+<!-- <management-function><text>import keys/secrets into  the secure key storage</text></management-function> -->
+<!-- <management-function><text>Configure local audit storage capacity</text></management-function> -->
+<!-- <management-function><text>Configure minimum password length</text></management-function> -->
+<!-- <management-function><text>Configure minimum number of special characters in password</text></management-function> -->
+<!-- <management-function><text>Configure minimum number of numeric characters in password</text></management-function> -->
+<!-- <management-function><text>Configure minimum number of uppercase characters in password</text></management-function> -->
+<!-- <management-function><text>Configure minimum number of lowercase characters in password</text></management-function> -->
+<!-- <management-function><text> -->
+<!--   Configure lockout policy for unsuccessful authentication attempts through -->
+<!--   <selectables> -->
+<!-- <selectable>timeouts between attempts</selectable> -->
+<!-- <selectable>limiting number of attempts during a time period</selectable> -->
+<!-- </selectables> -->
+<!-- </text></management-function> -->
+<!-- <management-function><text>Configure host-based firewall</text></management-function> -->
+<!-- <management-function><text>Configure name/address of directory server with which to bind</text></management-function> -->
+<!-- <management-function><text>Configure name/address of remote management server from which to receive management settings</text></management-function> -->
+<!-- <management-function><text>Configure name/address of audit/logging server to which to send audit/logging records</text></management-function> -->
+<!-- <management-function><text>Configure audit rules</text></management-function> -->
+<!-- <management-function><text>Configure name/address of network time server</text></management-function> -->
+<!-- <management-function><text>Enable/disable automatic software update</text></management-function> -->
+<!-- <management-function><text>Configure Wi-Fi interface</text></management-function> -->
+<!-- <management-function><text>Enable/disable Bluetooth interface</text></management-function> -->
+<!-- <management-function><text>Enable/disable <assignable> list of other external interfaces</assignable></text></management-function> -->
+<!-- <management-function><text><assignable>list of other management functions to be provided by the TSF</assignable></text></management-function> -->
+<!-- </management-function-set> -->
+<!-- . -->
+<!-- </title> -->
 
 
-</f-element>
-</f-component>
+<!-- </f-element> -->
+<!-- </f-component> -->
 </section>
 <section title="Protection of the TSF (FPT)" id="fpt">
 
@@ -2980,20 +3185,19 @@ with
 
 </f-element>
 </f-component>
-<f-component cc-id="fia_x509_ext.2" name="X.509 Certificate Authentication">
-  <f-element id="fel-cert-auth">
-    <title> The OS shall use X.509v3 certificates as defined by RFC 5280 to support
-    authentication for TLS and
-    <selectables>
-<selectable>DTLS</selectable>
-<selectable>HTTPS</selectable>
-<selectable><assignable>other protocols</assignable></selectable>
-</selectables>
-connections.
-</title>
-
-</f-element>
-</f-component>
+<!-- <f-component cc-id="fia_x509_ext.2" name="X.509 Certificate Authentication"> -->
+<!--   <f-element id="fel-cert-auth"> -->
+<!--     <title> The OS shall use X.509v3 certificates as defined by RFC 5280 to support -->
+<!--     authentication for TLS and -->
+<!--     <selectables> -->
+<!-- <selectable>DTLS</selectable> -->
+<!-- <selectable>HTTPS</selectable> -->
+<!-- <selectable><assignable>other protocols</assignable></selectable> -->
+<!-- </selectables> -->
+<!-- connections. -->
+<!-- </title> -->
+<!-- </f-element> -->
+<!-- </f-component> -->
 </section>
 <section title="TOE Access (FTA)" id="fta">
   <f-component cc-id="fta_tab.1" name="Default TOE access banners" status="optional">
