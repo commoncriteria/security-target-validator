@@ -269,10 +269,11 @@ def get_str_of_effective(git_el, is_updating, workdir):
 # os.path.realpath(__file__)
 mydir=(Path(os.path.dirname(__file__))/".."/"mock-transforms").resolve()
     
-def get_all_effectives(st, is_updating, workdir):
+def get_all_effectives(st_path, is_updating, workdir):
     if not(workdir.is_dir()):
         print("The directory to store reference repositories does not exist: "+str(workdir))
         sys.exit(1)
+    st = lxml.etree.parse(st_path)
 
     root, patt = make_schematron_skeleton()
     base_rule = make_root_rule(patt)
@@ -302,9 +303,9 @@ def get_all_effectives(st, is_updating, workdir):
     schematron = Schematron(root)
     res = schematron.validate(st)
     if res:
-        print("SUCCESS: "+sys.argv[2])
+        print("SUCCESS: "+st_path)
     else:
-        print("FAILURE: "+sys.argv[2])
+        print("FAILURE: "+st_path)
         print(schematron.error_log)
         
         # eff_xml_str = subprocess.check_output("EFF_XML='&1' make -s effective", shell=True, text=True)
@@ -313,7 +314,7 @@ def get_all_effectives(st, is_updating, workdir):
         # pp_doc = lxml.etree.parse("effective.xml")
                     
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print("Usage: [-v] [--dont-update] [<work-dir>] <st-xml>")
 #        print("Usage: <pp-xml> <st-xml>")
         sys.exit(0)
@@ -331,8 +332,7 @@ if __name__ == "__main__":
     if tempy.is_dir():
         workdir=tempy
         curr+=1
-    st = lxml.etree.parse(sys.argv[2])
-    get_all_effectives(st, should_update, workdir)
+    get_all_effectives(sys.argv[curr], should_update, workdir)
 
     
 
